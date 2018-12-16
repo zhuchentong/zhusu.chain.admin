@@ -1,0 +1,80 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>角色</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+  <ng-template #action>
+    <nz-button-group>
+      <button nz-button (click)="addRole()"><i class="anticon anticon-plus"></i>新增</button>
+    </nz-button-group>
+  </ng-template>
+</page-header>
+
+<nz-card [nzBordered]="false" class="mb-lg">
+
+  <nz-table #editRowTable [nzData]='roleList' [nzShowPagination]="false" [nzScroll]="{y: '370px' }">
+    <thead>
+      <tr>
+        <th>角色名</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let role of roleList; let i = index">
+        <td>
+          <div class="editable-cell">
+            <div class="editable-cell-text-wrapper">
+              <ng-container *ngIf="!editCache[role.id].edit">
+                {{role.authority}}
+              </ng-container>
+              <ng-container *ngIf="editCache[role.id].edit">
+                <input type="text" nz-input [(ngModel)]="editCache[role.id].data.authority">
+              </ng-container>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="editable-row-operations">
+            <ng-container *ngIf="!editCache[role.id].edit">
+              <a (click)="startEdit(role.id)">编辑</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <nz-popconfirm (nzOnConfirm)="deleteApp(role.id)" [nzTitle]="'是否要删除此角色？'">
+                <a nz-popconfirm>删除</a>
+              </nz-popconfirm>
+              <nz-divider nzType="vertical"></nz-divider>
+              <a (click)="toUser(role.id)">用户</a>
+
+            </ng-container>
+            <ng-container *ngIf="editCache[role.id].edit">
+              <a (click)="saveEdit(role.id)">保存</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <nz-popconfirm [nzTitle]="'确定撤销更改?'" (nzOnConfirm)="cancelEdit(role.id)">
+                <a nz-popconfirm>取消</a>
+              </nz-popconfirm>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-card>
+<nz-modal [nzVisible]="isVisible" [nzTitle]="modalTitle" [nzContent]="rolemodalContent" [nzFooter]="false" (nzOnCancel)="cancel()"
+  [nzWidth]="600" (nzOnOk)="serviceSubmit()">
+  <ng-template #rolemodalContent>
+    <div class="form">
+      <form nz-form [formGroup]="roleForm">
+        <nz-form-item>
+          <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="authority">角色名</nz-form-label>
+          <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+            <input nz-input formControlName="authority" id="authority" placeholder="请填入角色名">
+            <nz-form-explain *ngIf="roleForm.get('authority').dirty && roleForm.get('authority').errors">请输入角色名</nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </ng-template>
+</nz-modal>

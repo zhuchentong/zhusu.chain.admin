@@ -1,0 +1,30 @@
+<p>与广告发布者聊天：</p>
+<div class="message-wrap message-class">
+  <div *ngFor="let message of messageList" class="message"
+  [ngClass]="{
+    'message-left':currentUserId != message.sender.id,
+    'message-right':currentUserId === message.sender.id }">
+
+    <img class="user-img" [src]="currentUserId === message.sender.id?'assets/me.png':'assets/ta.png'"
+        width="20">
+    <div class="msg-detail">
+        <div class="msg-info">
+            <p>
+                {{message.userName}}&nbsp;&nbsp;&nbsp;{{message.dateCreated  | date: 'yyyy-MM-dd HH:mm' }}
+            </p>
+        </div>
+        <div class="msg-content">
+            <span class="triangle"></span>
+            <p class="line-breaker">{{message.content}}</p>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="textarea-class">
+    <textarea nz-input class="msg-class" rows="2" placeholder="请输入信息..." [(ngModel)]="content" (keyup.enter)="sendMessage($event)"
+     maxLength="200"></textarea>
+    <button  nz-button nzType="primary" nzShape="circle" (click)="sendMessage($event)">
+        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+    </button>
+  </div>

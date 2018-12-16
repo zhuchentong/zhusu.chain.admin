@@ -1,0 +1,58 @@
+<page-header  [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/sysorder']">订单管理</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>订单服务费</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+<nz-card [nzBordered]="false" class="mb-lg">
+  <div class="search-line">
+    状态：
+    <nz-select style="width: 250px" [(ngModel)]="q.isPaid" nzPlaceHolder="请选择状态" (ngModelChange)="selectStatus()">
+      <nz-option *ngFor="let status of statusList" [nzLabel]="status.label" [nzValue]="status.value">
+      </nz-option>
+    </nz-select>
+    供应商：
+    <nz-select style="width: 250px" nzPlaceHolder="请选择供应商" nzAllowClear [(ngModel)]="q.sellerId" name="sellerId"
+      (ngModelChange)="selectStatus()">
+      <nz-option *ngFor="let option of userList" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+    </nz-select>
+  </div>
+  <div nz-row [nzGutter]="24">
+    <div nz-col nzXs="24" nzSm="24" nzMd="24">
+      <nz-table [nzData]="orderFeeList" #basicTable [(nzPageSize)]="q.max" [nzTotal]="count" [(nzPageIndex)]="pageindex"
+        (nzPageIndexChange)="pageIndexChange($event)" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th>订单</th>
+            <th>用户</th>
+            <th>是否支付</th>
+            <th>审核人</th>
+            <th>创建时间</th>
+            <th>审批时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let orderfee of basicTable.data; let i = index">
+            <td><a>{{orderfee.hotelOrder.orderNo}}</a></td>
+            <td>{{orderfee.seller.displayName}}【{{orderfee.seller.username}}】</td>
+            <td>{{orderfee.isPaid | _Boolean}}</td>
+            <td>{{orderfee.checker?orderfee.checker.displayName+'-':'无'}}{{orderfee.checker?orderfee.checker.username:''}}</td>
+            <td>{{orderfee.dateCreated | date}}</td>
+            <td>{{orderfee.lastUpdated | date}}</td>
+            <td>
+              <a *ngIf="!orderfee.isPaid" nz-popconfirm nzTitle="你确定该订单的服务费已支付么?" (nzOnConfirm)="confirm(orderfee)">确认服务费</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+</nz-card>

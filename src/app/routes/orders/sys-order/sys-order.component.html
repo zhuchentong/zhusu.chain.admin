@@ -1,0 +1,370 @@
+<page-header [title]="''">
+    <ng-template #breadcrumb>
+        <nz-breadcrumb>
+            <nz-breadcrumb-item>
+                <a [routerLink]="['/']">首页</a>
+            </nz-breadcrumb-item>
+            <nz-breadcrumb-item>订单管理</nz-breadcrumb-item>
+        </nz-breadcrumb>
+    </ng-template>
+</page-header>
+<nz-card [nzBordered]="false" class="mb-lg">
+    <nz-tabset [nzTabBarExtraContent]="orderTemplate">
+        <nz-tab nzTitle="订单管理" (nzSelect)="clickTab('order')">
+            <div class="search-line">
+                状态：
+                <nz-select style="width: 250px" [(ngModel)]="q.status" nzPlaceHolder="请选择状态" (ngModelChange)="selectStatus()">
+                    <nz-option *ngFor="let status of statusList" [nzLabel]="status.label" [nzValue]="status.value">
+                    </nz-option>
+                </nz-select>
+            </div>
+            <div nz-row [nzGutter]="24">
+                <div nz-col nzXs="24" nzSm="24" nzMd="24">
+                    <nz-table [nzData]="orderList" #basicTable [(nzPageSize)]="q.max" [nzTotal]="count" [(nzPageIndex)]="pageindex"
+                        (nzPageIndexChange)="pageIndexChange($event)" [nzFrontPagination]="false"  [nzLoading]="loading" >
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>买家</th>
+                                <th>供应商</th>
+                                <th>订单信用分</th>
+                                <th>创建时间</th>
+                                <th>签单时间</th>
+                                <th>订单状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let order of basicTable.data; let i = index">
+                                <td><a (click)="showDetail(order.id)">{{order.orderNo}}</a></td>
+                                <td><a (click)="showUserDetail(order.buyer.id)">{{order.buyer.displayName}}【{{order.buyer.username}}】</a></td>
+                                <td *ngIf="order.seller !== undefined"><a (click)="showUserDetail(order.seller.id)">{{order.seller.displayName}}【{{order.seller.username}}】</a><a
+                                        (click)="toOrderFee(order.seller.id)">缴费记录</a></td>
+                                <td *ngIf="order.seller === undefined"></td>
+                                <td>{{order.points}}</td>
+                                <td>{{order.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+                                <td>{{order.dateSigned | date: 'yyyy-MM-dd HH:mm'}}</td>
+                                <td><a nz-popover nzTitle="执行情况" (click)="getExecution(order)" [nzContent]="popoverTemplate"
+                                        nzPlacement="bottom" nzTrigger="click">{{order.status | i18nSelect: statusMap}}</a></td>
+                            </tr>
+                        </tbody>
+                    </nz-table>
+                </div>
+            </div>
+            <ng-template #popoverTemplate>
+                <div>
+                    <nz-steps [nzCurrent]="currentStep" nzDirection="vertical" nzSize="small">
+                        <nz-step *ngFor="let s of executionStepList" nzTitle="{{s.title}}" nzDescription="{{s.text}}"></nz-step>
+                    </nz-steps>
+                </div>
+            </ng-template>
+        </nz-tab>
+        <nz-tab nzTitle="待缴服务费订单" (nzSelect)="clickTab('free')">
+            <nz-table [nzData]="orderFeeList" #orderFeeTable [nzPageSize]="10" [nzTotal]="orderFeeCount"
+                [(nzPageIndex)]="pageindex_orderFee" (nzPageIndexChange)="pageIndexOrderFee($event)"
+                [nzFrontPagination]="false">
+                <thead>
+                    <tr>
+                        <th>订单</th>
+                        <th>用户</th>
+                        <th>是否支付</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let orderfee of orderFeeTable.data; let i = index">
+                        <td><a (click)="showDetail(orderfee.hotelOrder.id)">{{orderfee.hotelOrder.orderNo}}</a></td>
+                        <td><a (click)="showUserDetail(orderfee.seller?.id)">{{orderfee.seller?.displayName}}【{{orderfee.seller?.username}}】</a></td>
+                        <td>{{orderfee.isPaid | _Boolean}}</td>
+                        <td>{{orderfee.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td>
+                            <a (click)="toOrderFee(orderfee.seller.id)">查看</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+        </nz-tab>
+    </nz-tabset>
+    <ng-template #orderTemplate>
+        <button nz-button (click)="clickBtn('free')">订单服务费</button>
+        <button nz-button (click)="clickBtn('pointLog')">订单信用分日志</button>
+        <!--
+
+            <button nz-button (click)="clickBtn('claim')">订单投诉</button>
+            -->
+    </ng-template>
+</nz-card>
+
+<nz-modal [nzVisible]="details_isVisible" [nzTitle]="'订单详情'" [nzContent]="detailContent" [nzFooter]="null" (nzOnCancel)="handleCancelDetail()"
+    [nzMaskClosable]="false" [nzWidth]="'90%'">
+    <ng-template #detailContent>
+        <div class="form">
+            <form nz-form>
+                <nz-steps class="step-line" [nzCurrent]="currentStep" nzSize="small">
+                    <nz-step *ngFor="let s of executionStepList" nzTitle="{{s.title}}" nzDescription="{{s.text}}&#10;{{s.time | date: 'yyyy-MM-dd HH:mm'}}"></nz-step>
+                </nz-steps>
+                <div nz-row>
+                    <div nz-col nzSpan="12" class="order-base">
+                        <span class="font-css">详情：</span>
+                        <div nz-row nz-form-item [nzGutter]="16">
+                            <div nz-col nzMd="24" nzSm="24" nzXs="24">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="4">
+                                        <label for="orderNo">订单编号：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="20">
+                                        <label>{{order.orderNo}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="title">订单状态：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.status | i18nSelect: statusMap}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="dateCreated">创建时间：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="dateSigned">签单时间：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.dateSigned | date: 'yyyy-MM-dd HH:mm'}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="confirmedBySeller">卖家确认：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.confirmedBySeller?'是':'否'}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="points">订单信用分：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.points}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="24" nzSm="24" nzXs="24">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="4">
+                                        <label for="invoice">发票信息：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="20">
+                                        <label *ngIf="order.invoice">姓名：{{order.invoice.name}} 
+                                            电话：{{order.invoice.tel}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="24" nzSm="24" nzXs="24">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="4">
+                                        <label for="amount">开票信息：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="20">
+                                        <label>{{order.billing}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="24" nzSm="24" nzXs="24">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="4">
+                                        <label for="address">收货地址：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="20">
+                                        <label *ngIf="order.address">{{[order.address.area] | _zones}}{{order.address.address}}
+                                            电话：{{order.address.tel}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div nz-col nzSpan="12" class="order-user">
+                        <span class="font-css">条款：</span>
+                        <div nz-row nz-form-item [nzGutter]="16">
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="buyer">买家：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.buyer.displayName}}【{{order.buyer.username}}】</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="seller">供应商：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label *ngIf="order.seller">{{order.seller.displayName}}【{{order.seller.username}}】</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="deadlineP1">首付款时间：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.deadlineP1}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="paymentP1">首付款比例：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.paymentP1}}%</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="deadlineP2">尾款时间：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.deadlineP2}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="paymentP2">尾款比例：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.paymentP2}}%</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div nz-col nzMd="12" nzSm="12" nzXs="12">
+                                <div nz-row>
+                                    <div nz-form-label nz-col [nzSm]="8">
+                                        <label for="deadline">到货时间：</label>
+                                    </div>
+                                    <div nz-form-label nz-col [nzSm]="16">
+                                        <label>{{order.deadline}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="font-css">商品：</span>
+                <nz-table #orderItemTable [nzData]="orderItemList" [nzScroll]="{ y: '240px' }" [nzShowPagination]="false">
+                    <thead>
+                        <tr>
+                            <th nzWidth="15%">商品</th>
+                            <th nzWidth="15%">信用分</th>
+                            <th nzWidth="15%">数量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of orderItemTable.data">
+                            <td>
+                                <img class="good-homeImage" *ngIf="data.hotel.homeImageUrl" src={{data.hotel.homeImageUrl}} onError="this.onerror=null;this.src='./assets/source/img/home_image.png';">
+                                {{data.hotel.name}}
+                            </td>
+                            <td>{{data.points}}</td>
+                            <td>{{data.number}}</td>
+                        </tr>
+                    </tbody>
+                </nz-table>
+                <div class="order-card">
+                    <nz-tabset [nzTabPosition]="'top'" [nzType]="'card'">
+                        <nz-tab [nzTitle]="'订单信用分'" (nzSelect)="clickTab('orderPoint')">
+                            <nz-table #orderPointLogTable [nzData]="orderPointLogList" [nzScroll]="{ y: '240px' }"
+                                [nzShowPagination]="false">
+                                <thead>
+                                    <tr>
+                                        <th nzWidth="15%">用户</th>
+                                        <th nzWidth="15%">信用分</th>
+                                        <th nzWidth="15%">创建时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let orderPoint of orderPointLogTable.data">
+                                        <td>{{orderPoint.user.displayName}}【{{orderPoint.user.username}}</td>
+                                        <td>{{orderPoint.points}}</td>
+                                        <td>{{orderPoint.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+                                    </tr>
+                                </tbody>
+                            </nz-table>
+                        </nz-tab>
+                        <nz-tab [nzTitle]="'订单Token奖罚'" (nzSelect)="clickTab('orderToken')">
+                            <nz-table #orderTokenLogTable [nzData]="orderTokenLogList" [nzScroll]="{ y: '240px' }"
+                                [nzShowPagination]="false">
+                                <thead>
+                                    <tr>
+                                        <th nzWidth="15%">用户</th>
+                                        <th nzWidth="15%">Token数</th>
+                                        <th nzWidth="15%">创建时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let orderToken of orderTokenLogTable.data">
+                                        <td>{{orderToken.user.displayName}}【{{orderToken.user.username}}</td>
+                                        <td>{{orderToken.tokens>0?'+':''}}{{orderToken.tokens}}</td>
+                                        <td>{{orderToken.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+                                    </tr>
+                                </tbody>
+                            </nz-table>
+                        </nz-tab>
+                        <nz-tab [nzTitle]="'订单消息'" (nzSelect)="clickTab('message')">
+                            <nz-table #orderMessageTable [nzData]="orderMessageList" [nzPageSize]="5" [nzTotal]="orderMessageCount"
+                                [(nzPageIndex)]="pageindex_orderMessage" (nzPageIndexChange)="pageIndexOrderMessage($event)"
+                                [nzFrontPagination]="false">
+                                <thead>
+                                    <tr>
+                                        <th>发信时间</th>
+                                        <th>发信人</th>
+                                        <th>内容</th>
+                                        <th>收信人</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let mes of orderMessageTable.data; let i = index">
+                                        <td>{{mes.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+                                        <td>{{mes.sender.displayName}}【{{mes.sender.username}}】</td>
+                                        <td>{{mes.content}}</td>
+                                        <td>{{mes.receiver.displayName}}【{{mes.receiver.username}}】</td>
+                                    </tr>
+                                </tbody>
+                            </nz-table>
+                        </nz-tab>
+                    </nz-tabset>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+</nz-modal>
+<user-detail></user-detail>

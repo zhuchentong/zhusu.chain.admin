@@ -1,0 +1,207 @@
+<page-header  [title]="''">
+    <ng-template #breadcrumb>
+        <nz-breadcrumb>
+            <nz-breadcrumb-item>
+                <a [routerLink]="['/']">首页</a>
+            </nz-breadcrumb-item>
+            <nz-breadcrumb-item>
+                <a [routerLink]="['/hotel']">商品</a>
+            </nz-breadcrumb-item>
+            <nz-breadcrumb-item>修改商品</nz-breadcrumb-item>
+        </nz-breadcrumb>
+    </ng-template>
+</page-header>
+<nz-card [nzBordered]="false">
+    <nz-tabset [nzTabBarExtraContent]="extraTemplate">
+        <nz-tab nzTitle="基本信息">
+            <form nz-form>
+                <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="name">名称</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+                        <input nz-input [(ngModel)]="hotel.name" name="name" placeholder="请输入商品名称">
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="isOnSale">是否上架</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+                        <label nz-checkbox [(ngModel)]="hotel.isOnSale" name="isOnSale">
+                            <span *ngIf="hotel.isOnSale===true">是</span>
+                            <span *ngIf="hotel.isOnSale===false">否</span>
+                        </label>
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="zone">商品分类</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+                        <nz-cascader (ngModelChange)="addCategoryId($event)" nzPlaceHolder="请选择分类/区域/货架" [nzOptions]="zoneAndStackList" name="zoneAndStack"
+                            [(ngModel)]="zoneAndStack">
+                        </nz-cascader>
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="recommendationIndex">推荐指数</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+                        <input nz-input [(ngModel)]="hotel.recommendationIndex" name="recommendationIndex" placeholder="请输入推荐指数">
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="points">信用分</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+                        <input nz-input [(ngModel)]="hotel.points" name="points" placeholder="请输入信用分">
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        </nz-tab>
+        <nz-tab nzTitle="商品相册">
+            <div nz-row [nzGutter]="16">
+                <div nz-col [nzMd]="24" nzSm="24" nzXs="24">
+                    <div nz-form-item nz-row>
+                        <div nz-form-label nz-col>
+                            <label>商品主图</label>
+                            <input name="homeImage" class="hidden" #homeImageInput (change)="homeImageFileChange($event)"
+                                type="file" accept="image/*" />
+                        </div>
+                        <div class="col-sm-24 no-padding-horizontal">
+                            <div class="imgDiv" *ngIf="homeImage.url">
+                                <div class="close">
+                                    <i class="fa fa-times-circle fa-lg" (click)='removeFile("homeImage",null)'></i>
+                                </div>
+                                <img [src]='homeImage.url' class="showImg" (click)="homeImageInput.click()" />
+                            </div>
+                            <div *ngIf="!homeImage.url" class="col-sm-2 no-padding-left padding-top-8">
+                                <i class="fa fa-plus-circle fa-2x" (click)="homeImageInput.click()"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div nz-row [nzGutter]="16">
+                <div nz-col [nzMd]="24" nzSm="24" nzXs="24">
+                    <div nz-form-item nz-row>
+                        <div nz-form-label nz-col>
+                            <label>轮播图</label>
+                            <input name="bannerImages" class="hidden" multiple="multiple" #bannerImages (change)="bannerImagesFileChange($event,-1)"
+                                type="file" accept="image/*" />
+                            <div>
+                                <div *ngFor="let item of bannerImagesList; let i=index">
+                                    <div class="imgDiv" ShowImgOrder>
+                                        <div class="close">
+                                            <i class="fa fa-times-circle fa-lg" (click)='removeFile("bannerImages",i)'></i>
+                                        </div>
+                                        <div *ngIf="i!==0" class="arrow-left" (click)="img_order('left',i)">
+                                            <i class="fa fa-arrow-circle-left fa-4x"></i>
+                                        </div>
+                                        <img [src]='item.url' class="showImg" (click)='bannerImagesIndex.click()' />
+                                        <div *ngIf="bannerImagesList.length-1 !== i" class="arrow-right" (click)="img_order('right',i)">
+                                            <i class="fa fa-arrow-circle-right fa-4x"></i>
+                                        </div>
+                                    </div>
+                                    <input name="bannerImagesIndex" class="hidden" multiple="multiple"
+                                        #bannerImagesIndex (change)="bannerImagesFileChange($event,i)" type="file"
+                                        accept="image/*" />
+                                </div>
+                                <div class="col-sm-2 no-padding-left padding-top-8">
+                                    <i class="fa fa-plus-circle fa-2x" (click)="bannerImages.click()"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nz-tab>
+        <nz-tab nzTitle="商品属性">
+            <!-- <form nz-form>
+                <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="name">商品分类</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+                        <nz-select (ngModelChange)="attrToList($event)" [(ngModel)]="hotel.tag.id" name="tag"
+                            [nzPlaceHolder]="'请选择分类'" [nzShowSearch]="true">
+                            <nz-option *ngFor="let i of tagList" [nzLabel]="i.label" [nzValue]="i.value">
+                            </nz-option>
+                        </nz-select>
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+            属性：
+            <nz-table #nzTable [nzData]="tagAttr" [nzPageSize]="tagAttr.length" [nzScroll]="{ y: '200px' }"
+                [nzShowPagination]="false">
+                <thead>
+                    <tr>
+                        <th nzWidth="30%">属性名</th>
+                        <th>描述</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of nzTable.data">
+                        <td>{{data.name}}</td>
+                        <td>{{data.describe}}</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-divider></nz-divider> -->
+            自定义属性：
+            <div nz-col nzMd="24" nzSm="24" nzXs="24">
+                <div nz-row>
+                    <nz-table class="attr" [nzData]="addonsList" [nzShowPagination]="false">
+                        <thead nz-thead>
+                            <tr>
+                                <th nz-th>属性名</th>
+                                <th nz-th>描述</th>
+                                <th nz-th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody nz-tbody>
+                            <tr nz-tbody-tr *ngFor="let addons of addonsList; let i = index">
+                                <td nz-td>
+                                    <span *ngIf="editIndex!==i">{{addons.name}}</span>
+                                    <span *ngIf="editIndex===i" nz-form-control>
+                                        <input nz-input nzPlaceHolder="请输入属性名" name="name" [(ngModel)]="addons.name">
+                                    </span>
+                                </td>
+                                <td nz-td>
+                                    <span *ngIf="editIndex!==i">{{addons.describe}}</span>
+                                    <span *ngIf="editIndex===i" nz-form-control>
+                                        <input nz-input nzPlaceHolder="请输入描述" name="describe" [(ngModel)]="addons.describe">
+                                    </span>
+                                </td>
+                                <td nz-td>
+                                    <span *ngIf="editIndex!==i">
+                                        <a (click)="edit(i)">编辑</a>
+                                        <nz-divider nzType="vertical"></nz-divider>
+                                        <nz-popconfirm (nzOnConfirm)="del(i)" [nzTitle]="'是否要删除此行？'">
+                                            <a nz-popconfirm>删除</a>
+                                        </nz-popconfirm>
+                                    </span>
+                                    <span *ngIf="editIndex===i">
+                                        <a (click)="save(i)">保存</a>
+                                        <nz-divider nzType="vertical"></nz-divider>
+                                        <nz-popconfirm (nzOnConfirm)="cancel(i)" [nzTitle]="'是否要取消操作？'">
+                                            <a nz-popconfirm>取消</a>
+                                        </nz-popconfirm>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </nz-table>
+                    <button *ngIf="editIndex===-1" nz-button [nzType]="'dashed'" [nzSize]="'large'" (click)="add()"
+                        class="ant-btn__block mt-md">
+                        <i class="anticon anticon-plus"></i>
+                        <span>新增属性</span>
+                    </button>
+                </div>
+            </div>
+        </nz-tab>
+        <nz-tab nzTitle="商品详情">
+            <md-editor name="Content" placeholder="请输入商品详情..." [(ngModel)]="hotel.body" required maxlength="5000"></md-editor>
+        </nz-tab>
+    </nz-tabset>
+    <ng-template #extraTemplate>
+        <!-- <nz-tooltip [nzTitle]="'保存后可预览'" [nzPlacement]="'top'">
+            <button nz-button nz-tooltip [disabled]="!hotel.id" [nzType]="'primary'"  (click)="preview()">预览</button>
+        </nz-tooltip> -->
+        &nbsp;
+        <button nz-button *ngIf="!isUpdate" [nzType]="'primary'" (click)="uploadToOss()">{{setting.bttitle}}</button>
+        <button nz-button *ngIf="isUpdate" [nzType]="'primary'" (click)="uploadToOss()">{{setting.bttitle}}</button>
+        <button nz-button [nzType]="'default'" (click)="return()">取消</button>
+    </ng-template>
+</nz-card>

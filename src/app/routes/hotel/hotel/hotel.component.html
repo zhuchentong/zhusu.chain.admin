@@ -1,0 +1,23 @@
+<page-header  [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>房源管理</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+<nz-card [nzBordered]="false">
+  <nz-tabset [nzTabBarExtraContent]="extraTemplate">
+    <nz-tab nzTitle="上架商品" (nzSelect)="selectTab('on')">
+      <hotel-list #onSaleComponent></hotel-list>
+    </nz-tab>
+    <nz-tab nzTitle="下架商品" (nzSelect)="selectTab('down')">
+      <hotel-list #downSaleComponent></hotel-list>
+    </nz-tab>
+  </nz-tabset>
+  <ng-template #extraTemplate>
+    <button nz-button (click)="clickExtraTemplate('tag')">分类管理</button>
+  </ng-template>
+</nz-card>

@@ -1,0 +1,49 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>平台钱包</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+  <ng-template #action>
+    <nz-input-group nzSearch [nzSuffix]="suffixIconButton">
+      <input type="text" nz-input placeholder="可按 地址 搜索">
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+      <button nz-button nzType="primary" nzSearch><i class="anticon anticon-search"></i></button>
+    </ng-template>
+  </ng-template>
+</page-header>
+<nz-card [nzBordered]="false">
+  <nz-table #basicTable [nzData]="dataSet">
+    <thead>
+      <tr>
+        <th>地址</th>
+        <th>以太坊交易号</th>
+        <th>Token数</th>
+        <th>执行完毕</th>
+        <th>交易时间</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of basicTable.data">
+        <td>{{data.address}}</td>
+        <td>{{data.tx}}</td>
+        <td *ngIf="data.tokens > 0" style="color:green">{{data.tokens}}
+
+        </td>
+        <td *ngIf="data.tokens < 0" style="color:red">{{data.tokens}}
+
+        </td>
+        <td>
+          <nz-badge *ngIf="data.done" [nzStatus]="'success'" [nzText]="'完毕'"></nz-badge>
+          <nz-badge *ngIf="!data.done" [nzStatus]="'error'" [nzText]="'未结束'"></nz-badge>
+        </td>
+        <td>{{data.dateCreated}}</td>
+
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-card>

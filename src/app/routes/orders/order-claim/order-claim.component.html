@@ -1,0 +1,43 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/sysorder']">订单管理</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>订单投诉</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+<nz-card [nzBordered]="false" class="mb-lg">
+  <div nz-row [nzGutter]="24">
+    <div nz-col nzXs="24" nzSm="24" nzMd="24">
+      <nz-table [nzData]="orderClaimList" #basicTable>
+        <thead>
+          <tr>
+            <th>订单</th>
+            <th>投诉人</th>
+            <th>投诉时间</th>
+            <th>投诉内容</th>
+            <th>处理人</th>
+            <th>处理结果</th>
+            <th>处理时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let claim of basicTable.data; let i = index">
+            <td><a>{{claim.hotelOrder.orderNo}}</a></td>
+            <td>{{claim.creator.displayName}}【{{claim.creator.username}}】</td>
+            <td>{{claim.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+            <td>{{claim.content}}</td>
+            <td>{{claim.operator?claim.operator.displayName+'-':'无'}}{{claim.operator?orderfee.operator.username:''}}</td>
+            <td>{{claim.result?claim.result:'无'}}</td>
+            <td>{{claim.lastUpdated | date: 'yyyy-MM-dd HH:mm'}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+</nz-card>

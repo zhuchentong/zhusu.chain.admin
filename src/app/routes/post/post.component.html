@@ -1,0 +1,169 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>广告管理</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+<nz-card [nzBordered]="false">
+  <div class="search-line">
+    状态：
+    <nz-select style="width: 250px" [(ngModel)]="q.status" nzPlaceHolder="请选择状态" (ngModelChange)="selectStatus()">
+      <nz-option *ngFor="let status of statusList" [nzLabel]="status.label" [nzValue]="status.value">
+      </nz-option>
+    </nz-select>
+    <div style="float: right;">
+      <button nz-button (click)="addPost()"><i class="anticon anticon-plus"></i>新增广告</button>
+    </div>
+  </div>
+  
+  <nz-table #basicTable [nzData]="postList" [(nzPageSize)]="q.max" [nzFrontPagination]="false" [nzTotal]="count"
+    [(nzPageIndex)]="pageindex" (nzPageIndexChange)="pageIndexChange($event)"  [nzLoading]="loading">
+    <thead>
+      <tr>
+        <th>发帖人</th>
+        <th>发布时间</th>
+        <th>标题</th>
+        <th>发布状态</th>
+        <th>拒稿原因</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of basicTable.data">
+        <td><a (click)="showUserDetail(data.writer.id)">{{data.writer.displayName}}【{{data.writer.username}}】</a></td>
+        <td>{{data.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+        <td><a (click)="toDetail(data)">{{data.title}}</a></td>
+        <td>{{data.status | i18nSelect: statusMap}}</td>
+        <td>{{data.reason || '无'}}</td>
+        <td>
+          <a *ngIf="data.status === 'DRAFT'" (click)="check(data)">审核</a>
+          <a *ngIf="data.status === 'PUBLISHED'" (click)="toMessage(data)">查看消息</a>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-card>
+<nz-modal [nzVisible]="isVisible" [nzTitle]="modalTitle" [nzContent]="content" (nzOnCancel)="handleCancel()" [nzFooter]="null"
+  [nzWidth]="1200" (nzOnOk)="submitCheck()">
+  <ng-template #content>
+    <div nz-row>
+      <div class="post" nz-col nzSpan="12">
+        <div class="title">
+          {{post.title}}
+        </div>
+        <div class="post-content">
+          {{post.content}}
+        </div>
+        <div class="writer">
+          {{post.writer.displayName}}【{{post.writer.username}}】
+        </div>
+        <div class="date">
+          {{post.dateCreated | date}}
+        </div>
+        <div class="writer-count">
+          （该用户已经发布了&nbsp;&nbsp;{{postCountByWriter}}&nbsp;&nbsp;条广告）
+        </div>
+        <nz-divider></nz-divider>
+        <div style="text-align: center">
+          <button nz-button nzType="primary" (click)="clickBtn('ok')">同意</button>
+          <button nz-button nzType="danger" (click)="clickBtn('refuse')">拒绝</button>
+        </div>
+        <nz-divider></nz-divider>
+      </div>
+      <div *ngIf="isVisible" nz-col nzSpan="12">
+        <post-dialog [postId] = "post.id" [writerId] = "post.writer.id"></post-dialog>
+      </div>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<nz-modal [nzVisible]="detail_isVisible" [nzTitle]="modalTitle" [nzContent]="detailContent" (nzOnCancel)="cancelDetail()" [nzFooter]="null"
+  [nzWidth]="1200">
+  <ng-template #detailContent>
+    <div nz-row>
+      <div class="post" nz-col nzSpan="12">
+        <div class="title">
+          {{post.title}}
+        </div>
+        <div class="post-content">
+          {{post.content}}
+        </div>
+        <div class="writer">
+          {{post.writer.displayName}}【{{post.writer.username}}】
+        </div>
+        <div class="date">
+          {{post.dateCreated | date}}
+        </div>
+      </div>
+      <div *ngIf="detail_msg_isVisible" nz-col nzSpan="12">
+          <post-dialog [postId] = "post.id" [writerId] = "post.writer.id"></post-dialog>
+      </div>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<nz-modal [nzVisible]="refuse_isVisible" [nzTitle]="'请填写拒绝原因'" [nzContent]="refuseContent" (nzOnCancel)="cancelRefuse()"
+  [nzWidth]="600" (nzOnOk)="refuse()">
+  <ng-template #refuseContent>
+    <textarea class="status" rows="4" nz-input [(ngModel)]="reason" name="reason" placeholder="请填入原因" maxlength="100"></textarea>
+  </ng-template>
+</nz-modal>
+
+<nz-modal [nzVisible]="post_isVisible" [nzTitle]="modalTitle" [nzContent]="addcontent" [nzFooter]="false" (nzOnCancel)="handleCancel()"
+  [nzWidth]="600" (nzOnOk)="submitPost()">
+  <ng-template #addcontent>
+    <form nz-form>
+      <nz-form-item>
+        <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="title">标题</nz-form-label>
+        <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+          <input nz-input [(ngModel)]="post.title" name="title" placeholder="请填入标题">
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="content">内容</nz-form-label>
+        <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+          <textarea class="status" rows="14" nz-input [(ngModel)]="post.content" name="content" placeholder="请填入内容，最多500字符"
+            maxlength="500"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzXs="24" nzSm="7" nzFor="content">可读人</nz-form-label>
+        <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+          <nz-select style="width: 100%" nzMode="multiple" nzPlaceHolder="默认所有人可读" [(ngModel)]="readers" name="readers">
+            <nz-option *ngFor="let option of userList" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-template>
+</nz-modal>
+
+<nz-modal [nzVisible]="message_isVisible" [nzTitle]="'广告消息'" [nzContent]="messageContent" (nzOnCancel)="cancelMessage()"
+  [nzFooter]="null" [nzWidth]="800">
+  <ng-template #messageContent>
+    <nz-table #postMessageTable [nzData]="postMessageList" [nzPageSize]="10" [nzTotal]="postMessageCount"
+      [(nzPageIndex)]="pageindex_postMessage" (nzPageIndexChange)="pageIndexPostMessage($event)" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>发信时间</th>
+          <th>发信人</th>
+          <th>内容</th>
+          <th>收信人</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mes of postMessageTable.data; let i = index">
+          <td>{{mes.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{mes.sender.displayName}}【{{mes.sender.username}}】</td>
+          <td>{{mes.content}}</td>
+          <td>{{mes.receiver.displayName}}【{{mes.receiver.username}}】</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </ng-template>
+</nz-modal>
+<user-detail></user-detail>

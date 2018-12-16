@@ -1,0 +1,87 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>用户管理</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+
+<nz-card [nzBordered]="false" class="mb-lg">
+  <nz-tabset [(nzSelectedIndex)]="selectedIndex">
+    <nz-tab nzTitle="用户管理" (nzSelect)="clickTab('user')">
+      <div class="search-line">
+        角色：
+        <nz-select style="width: 250px" [(ngModel)]="q.role" nzAllowClear nzPlaceHolder="请选择角色" (ngModelChange)="selectRole($event)">
+          <nz-option *ngFor="let role of roleList" [nzLabel]="role.label" [nzValue]="role.value">
+          </nz-option>
+        </nz-select>
+        <button nz-button class="btn" (click)="addUser()"><i class="anticon anticon-plus"></i>新增</button>
+      </div>
+      <div nz-row [nzGutter]="24">
+        <div nz-col nzXs="24" nzSm="24" nzMd="24">
+          <nz-table [nzData]="userList" #basicTable [(nzPageSize)]="q.max" [nzTotal]="count" [(nzPageIndex)]="pageindex"
+            (nzPageIndexChange)="pageIndexChange($event)" [nzFrontPagination]="false" [nzLoading]="loading">
+            <thead>
+              <tr>
+                <th>手机号</th>
+                <th>昵称</th>
+                <th>有效</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of basicTable.data; let i = index">
+                <td>{{user.username}}</td>
+                <td>{{user.displayName}}</td>
+                <td>{{user.enabled | _Boolean}}</td>
+                <td>
+                  <a nz-popconfirm nzTitle="你确定重置该用户的密码么?" (nzOnConfirm)="resetPassword(user.username)">重置密码</a>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a nz-popconfirm nzTitle="你确定冻结该用户么?" *ngIf="user.enabled" (nzOnConfirm)="accountLocked(user,'frozen')">冻结用户</a>
+                  <a nz-popconfirm nzTitle="你确定解冻该用户么?" *ngIf="!user.enabled" (nzOnConfirm)="accountLocked(user,'unfrozen')">解冻用户</a>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+    </nz-tab>
+  </nz-tabset>
+</nz-card>
+
+<nz-modal [nzVisible]="user_isVisible" [nzTitle]="modalTitle" [nzContent]="content" [nzFooter]="false" (nzOnCancel)="handleCancel()"
+  [nzWidth]="600" (nzOnOk)="saveUser()" [nzMaskClosable]="false">
+  <ng-template #content>
+    <div class="form">
+      <nz-alert nzType="error" nzMessage="新增人员密码为：888888"></nz-alert>
+      <form nz-form>
+        <nz-form-item>
+          <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="displayName">昵称</nz-form-label>
+          <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+            <input nz-input [(ngModel)]="user.displayName" name="displayName" placeholder="请填入昵称">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="username">手机号</nz-form-label>
+          <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+            <input nz-input [(ngModel)]="user.username" name="username" placeholder="请填入手机号">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="role">角色</nz-form-label>
+          <nz-form-control nzXs="24" nzSm="12" nzMd="10">
+            <nz-select style="width: 250px" [(ngModel)]="user.role" name="role" nzAllowClear nzPlaceHolder="请选择角色">
+              <nz-option [nzLabel]="'系统管理员'" [nzValue]="'ROLE_ADMIN'"></nz-option>
+              <nz-option [nzLabel]="'酒店管理员'" [nzValue]="'ROLE_SELLER'"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<user-detail></user-detail>

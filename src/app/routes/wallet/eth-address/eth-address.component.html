@@ -1,0 +1,53 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>平台钱包</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+  <desc-list size="small" col="3">
+    <desc-list-item term="账户总数">
+      300
+    </desc-list-item>
+  </desc-list>
+  <ng-template #action>
+    <nz-input-group nzSearch [nzSuffix]="suffixIconButton">
+      <input type="text" nz-input placeholder="可按 拥有者 搜索">
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+      <button nz-button nzType="primary" nzSearch><i class="anticon anticon-search"></i></button>
+    </ng-template>
+  </ng-template>
+</page-header>
+<nz-table #nestedTable [nzData]="nestedTableData" [nzPageSize]="10">
+  <thead>
+    <tr>
+      <th nzShowExpand></th>
+      <th>拥有者</th>
+      <th>电话</th>
+      <th>加入时间</th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-template ngFor let-data [ngForOf]="nestedTable.data">
+      <tr>
+        <td nzShowExpand [(nzExpand)]="data.expand"></td>
+        <td>{{data.owner}}</td>
+        <td>{{data.username}}</td>
+        <td>{{data.createdAt}}</td>
+      </tr>
+      <tr [nzExpand]="data.expand">
+        <td></td>
+        <td colspan="7">
+          <nz-table #innerTable [nzData]="innerTableData" nzSize="middle" [nzShowPagination]="false">
+
+  <tbody>
+    <tr *ngFor="let data of innerTable.data">
+      <td>{{data.name}}</td>
+      <td>{{data.address}}</td>
+
+    </tr>
+  </tbody>
+</nz-table>

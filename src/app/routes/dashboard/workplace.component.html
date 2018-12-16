@@ -1,0 +1,44 @@
+<div nz-row [nzGutter]="16" style="margin-top:100px;">
+  <div nz-col [nzXs]="24" [nzMd]="24" class="mb-md">
+    <div nz-row [nzType]="'flex'" [nzJustify]="'center'" [nzAlign]="'middle'" class="bg-white py-md rounded-md">
+      <div nz-col [nzSpan]="3" class="text-center">
+        <nz-avatar nzIcon="anticon anticon-user" style="background-color:#7265e6;font-size: 20px" nzSize="large"></nz-avatar>
+      </div>
+      <div nz-col [nzSpan]="3">
+        <a [routerLink]="['/user']" class="hedaer-link">
+          <strong class="display-2">{{userCount}}</strong> 个
+          <div class="text-grey">用户数</div>
+        </a>
+      </div>
+      <div nz-col [nzSpan]="3" class="text-center">
+        <nz-avatar nzIcon="icon-home" style="background-color:#f56a00;font-size: 20px" nzSize="large"></nz-avatar>
+      </div>
+      <div nz-col [nzSpan]="3">
+        <a [routerLink]="['/hotel']" class="hedaer-link">
+          <strong class="display-2">{{hotelCount}}</strong> 个
+          <div class="text-grey">酒店数</div>
+        </a>
+      </div>
+
+      <div nz-col [nzSpan]="3" class="text-center">
+        <nz-avatar style="color:white; background-color:#00a2ae;" nzIcon="anticon anticon-wallet" nzSize="large"></nz-avatar>
+      </div>
+
+      <div nz-col [nzSpan]="3">
+        <a [routerLink]="['/sysorder']" class="hedaer-link">
+          <strong class="display-2">{{orderCount}}</strong> 个
+          <div class="text-grey">订单数</div>
+        </a>
+      </div>
+      <div nz-col [nzSpan]="3" class="text-center">
+        <nz-avatar style="color:white; background-color:#52c41a;" nzIcon="anticon anticon-bank" nzSize="large"></nz-avatar>
+      </div>
+      <div nz-col [nzSpan]="3">
+        <a class="hedaer-link" [routerLink]="['/user']">
+          <strong class="display-2">{{salerCount}}</strong> 个
+          <div class="text-grey">酒店管理员</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

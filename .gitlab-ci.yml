@@ -1,0 +1,37 @@
+variables:
+#  NPM_CONFIG_REGISTRY: https://registry.npm.taobao.org
+  NPM_CONFIG_ELECTRON_MIRROR: https://npm.taobao.org/mirrors/electron/
+  NPM_CONFIG_SASS_BINARY_SITE: https://npm.taobao.org/mirrors/node-sass
+  NPM_CONFIG_PHANTOMJS_CDNURL: https://npm.taobao.org/mirrors/phantomjs
+
+before_script:
+  - export
+  - node -v
+  - npm -v
+
+build:
+  script:
+    - export
+    - npm ci
+    - npm run build -- --prod --progress=false
+  artifacts:
+    name: prod
+    paths:
+      - dist/
+    expire_in: 1 day
+
+部署产品环境:
+  stage: deploy
+  variables:
+    CDN_URL: https://jupiter-admin.shifudao.com/
+    OSS_BUCKET: jupiter-admin
+  script:
+    - export
+    - test -z "$(ls -A dist/)" && npm ci && npm run build -- --prod
+    - ./deploy.sh
+  when: manual
+  environment:
+    name: production
+    url: ${CDN_URL}
+  only:
+    - branches@jupiter/admin

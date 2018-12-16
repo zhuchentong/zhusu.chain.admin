@@ -1,0 +1,40 @@
+<nz-card [nzBordered]="false">
+    <div class="mb-md">
+        <button nz-button (click)="edit({id:0})" [nzType]="'primary'" >
+            <i class="anticon anticon-plus"></i>
+            <span>新建</span>
+        </button>
+        <!-- <nz-input-group nzSuffixIcon="anticon anticon-search" style="padding-left: 15px;width:175px">
+          <input type="text" nz-input placeholder="可按 商品名 搜索">
+        </nz-input-group> -->
+    </div>
+    <nz-table #basicTable [nzData]="hotelList"  [(nzPageSize)]="q.max"  [nzFrontPagination]="false" [nzTotal]="count"
+    [(nzPageIndex)]="pageindex" (nzPageIndexChange)="pageIndexChange($event)"  [nzLoading]="loading" >
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th>商品货架</th>
+          <th>商品分类</th>
+          <th>信用分</th>
+          <th>推荐指数</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data">
+          <td>{{data.name}}</td>
+          <td>{{data.stack.name}}</td>
+          <td>{{data.tag.name}}</td>
+          <td>{{data.points}}</td>
+          <td>{{data.recommendationIndex}}</td>
+          <td>
+            <a (click)="edit(data)">修改</a>
+             <!-- <nz-divider nzType="vertical"></nz-divider>
+            <a (click)="deleteGood(data)">删除</a> -->
+            <!--<nz-divider nzType="vertical"></nz-divider>
+            <a (click)="preview(data)">预览</a> -->
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+</nz-card>

@@ -1,0 +1,65 @@
+{
+  "app": {
+    "name": "住宿链后台管理系统",
+    "description": "住宿链后台管理系统"
+  },
+  "menu": [
+    {
+      "text": "菜单",
+      "i18n": "main_navigation",
+      "group": true,
+      "hideInBreadcrumb": true,
+      "children": [
+        {
+          "text": "首页",
+          "i18n": "home",
+          "icon": "icon-home",
+          "link": "/home",
+          "reuse": false
+        },
+        {
+          "text": "用户管理",
+          "i18n": "user",
+          "icon": "icon-user",
+          "link": "/user",
+          "reuse": false
+        },
+        {
+          "text": "房源管理",
+          "i18n": "hotel",
+          "icon": "icon-list",
+          "reuse": false,
+          "link": "/hotel"
+        },
+        {
+          "text": "订单管理",
+          "i18n": "orders",
+          "icon": "icon-book-open",
+          "reuse": false,
+          "link": "/sysorder"
+        },
+        {
+          "text": "钱包管理",
+          "i18n": "wallet",
+          "icon": "icon-wallet",
+          "reuse": false,
+          "link": "/wallet"
+        },
+        {
+          "text": "系统公告",
+          "i18n": "post",
+          "icon": "icon-doc",
+          "reuse": false,
+          "link": "/post"
+        },
+        {
+          "text": "系统设置",
+          "i18n": "settings",
+          "icon": "icon-settings",
+          "reuse": false,
+          "link": "/settings"
+        }
+      ]
+    }
+  ]
+} 

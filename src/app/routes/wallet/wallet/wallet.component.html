@@ -1,0 +1,132 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>钱包管理</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+<nz-card [nzBordered]="false">
+      <!-- 图 -->
+      <div nz-row [nzGutter]="24" class="pt-lg">
+          <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="8">
+            <g2-card [title]="'token总数'" total="8,848" contentHeight="46px" [action]="action2" >
+              <ng-template #action2>
+                <nz-tooltip [nzTitle]="'交易总数'">
+                  <i nz-tooltip nz-icon type="info-circle"></i>
+                </nz-tooltip>
+              </ng-template>
+              <g2-mini-area color="#975FE4" height="46" [data]="visitData"></g2-mini-area>
+            </g2-card>
+          </div>
+          <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="8">
+              <g2-card [title]="'质押token数'" total="126,560" contentHeight="44px" [action]="action1">
+                <ng-template #action1>
+                  <nz-tooltip [nzTitle]="'质押token数'">
+                    <i nz-tooltip nz-icon type="info-circle"></i>
+                  </nz-tooltip>
+                </ng-template>
+                <trend flag="up" style="display:block; margin-top:2px;">
+                  周同比
+                  <span class="pl-sm">12%</span>
+                </trend>
+                <trend flag="down">
+                  日同比
+                  <span class="pl-sm">11%</span>
+                </trend>
+              </g2-card>
+            </div>
+            <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="8">
+                <g2-card [title]="'交易token数'" total="126,560" contentHeight="44px" [action]="action1">
+                  <ng-template #action1>
+                    <nz-tooltip [nzTitle]="'交易token数'">
+                      <i nz-tooltip nz-icon type="info-circle"></i>
+                    </nz-tooltip>
+                  </ng-template>
+                  <trend flag="up" style="display:block; margin-top:2px;">
+                    周同比
+                    <span class="pl-sm">12%</span>
+                  </trend>
+                  <trend flag="down">
+                    日同比
+                    <span class="pl-sm">11%</span>
+                  </trend>
+                </g2-card>
+              </div>
+        </div>
+  <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="18">
+    <div class="search-line">
+        以太坊交易号：
+        <input style="width:200px" nz-input placeholder="请输入以太坊交易号" [(ngModel)]="q.tx" (ngModelChange)="searchData()">
+        源地址：
+        <input style="width:200px" nz-input placeholder="请输入源地址" [(ngModel)]="q.src" (ngModelChange)="searchData()">
+        目标地址：
+        <input style="width:200px" nz-input placeholder="请输入目标地址" [(ngModel)]="q.dest" (ngModelChange)="searchData()">
+        <br/>
+        <div class="search">
+            执行完毕：
+            <nz-select style="width: 100px" [(ngModel)]="q.done" nzPlaceHolder="请选择" (ngModelChange)="searchData()">
+                <nz-option *ngFor="let done of doneList" [nzLabel]="done.label" [nzValue]="done.value">
+                </nz-option>
+            </nz-select>
+            交易类型：
+            <nz-select style="width: 200px" [(ngModel)]="q.usage" nzPlaceHolder="请选择交易类型" (ngModelChange)="searchData()">
+                <nz-option *ngFor="let usage of usageList" [nzLabel]="usage.label" [nzValue]="usage.value">
+                </nz-option>
+            </nz-select>
+            时间：
+            <nz-range-picker [nzFormat]="dateFormat" [(ngModel)]="date" (ngModelChange)="selectDate()"></nz-range-picker>
+        </div>
+    </div>
+    <nz-table [nzData]="txLogList"  #basicTable  [(nzPageSize)]="q.max"  [nzTotal]="count"
+    [(nzPageIndex)]="pageindex" (nzPageIndexChange)="pageIndexChange($event)" [nzFrontPagination]="false"  [nzLoading]="loading">
+        <thead>
+          <tr>
+            <th>源地址</th>
+            <th>目标地址</th>
+            <th style="width: 10%;">token数</th>
+            <th>以太坊交易号</th>
+            <th style="width: 10%;">交易类型</th>
+            <th style="width: 10%;">是否执行完毕</th>
+            <th style="width: 15%;">时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data">
+            <td>{{data.src}}</td>
+            <td>{{data.dest}}</td>
+            <td>{{data.tokens}}</td>
+            <td>{{data.tx}}</td>
+            <td>{{data.usage | i18nSelect: usageMap}}</td>
+            <td>{{data.done?'是':'否'}}</td>
+            <td>{{data.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+    <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="6">
+      <g2-card [title]="'点对点交易数'" total="560" contentHeight="46px" [action]="action3" [footer]="footer3">
+          <ng-template #action3>
+            <nz-tooltip nzTitle="点对点交易成功数">
+              <i nz-tooltip class="anticon anticon-info-circle-o"></i>
+            </nz-tooltip>
+          </ng-template>
+          <g2-mini-bar height="46" [data]="visitData"></g2-mini-bar>
+          <ng-template #footer3>
+            <p class="text-truncate mb0">日成交量
+              <span class="ml-sm">2,333</span>
+            </p>
+          </ng-template>
+      </g2-card>
+      <g2-card [title]="'近一周交易数'" total="848" contentHeight="46px" [action]="action2" >
+          <ng-template #action2>
+            <nz-tooltip [nzTitle]="'近一周交易数'">
+              <i nz-tooltip nz-icon type="info-circle"></i>
+            </nz-tooltip>
+          </ng-template>
+          <g2-mini-area color="#019858" height="46" [data]="visitData"></g2-mini-area>
+        </g2-card>
+    </div>
+</nz-card>

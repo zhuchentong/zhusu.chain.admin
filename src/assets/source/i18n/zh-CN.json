@@ -1,0 +1,19 @@
+{
+  "home": "首页",
+  "settings": "设置",
+  "profile": "个人中心",
+  "login": "登录",
+  "logout": "退出系统",
+  "top-search-ph": "搜索：员工、房源、广告等",
+  "language": "语言",
+  "shortcut": "快捷菜单",
+  "main_navigation": "主导航",
+  "pro-user": "账户",
+  "pro-login": "登录",
+  "hotel": "房源管理",
+  "orders": "订单管理",
+  "wallet": "钱包管理",
+  "user": "用户管理",
+  "post": "系统公告",
+  "role": "角色管理"
+}
