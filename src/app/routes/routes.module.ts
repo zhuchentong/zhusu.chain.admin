@@ -25,9 +25,6 @@ import { TagComponent } from './hotel/tag/tag.component';
 import { HotelListComponent } from './hotel/hotel/hotel-list.component';
 import { HotelEditComponent } from './hotel/hotel/edit/hotel-edit.component';
 import { LMarkdownEditorModule } from 'ngx-markdown-editor';
-import { OrderFeeComponent } from './orders/order-fee/order-fee.component';
-import { OrderPointLogComponent } from './orders/order-point-log/order-point-log.component';
-import { OrderClaimComponent } from './orders/order-claim/order-claim.component';
 import { Token } from '@angular/compiler';
 import { UserDetailComponent } from './user/user-detail/user-detail.component';
 import { PostDialogComponent } from './post/post-dialog/post-dialog.component';
@@ -53,9 +50,6 @@ const COMPONENTS = [
   HotelListComponent,
   HotelEditComponent,
   TagComponent,
-  OrderFeeComponent,
-  OrderPointLogComponent,
-  OrderClaimComponent,
   UserDetailComponent,
   PostDialogComponent,
   SettingsComponent

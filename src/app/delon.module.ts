@@ -21,9 +21,9 @@ import { DelonCacheModule } from '@delon/cache';
 import { DelonUtilModule } from '@delon/util';
 // mock
 import { DelonMockModule } from '@delon/mock';
-import * as MOCKDATA from '../../_mock';
+// import * as MOCKDATA from '../../_mock';
 import { environment } from '@env/environment';
-const MOCKMODULE = !environment.production ? [DelonMockModule.forRoot({ data: MOCKDATA })] : [];
+// const MOCKMODULE = !environment.production ? [DelonMockModule.forRoot({ data: MOCKDATA })] : [];
 
 // region: global config functions
 
@@ -52,7 +52,7 @@ export function delonAuthConfig(): DelonAuthConfig {
     DelonUtilModule.forRoot(),
     AdG2ChartModule.forRoot(),
     // mock
-    ...MOCKMODULE,
+    // ...MOCKMODULE,
   ],
 })
 export class DelonModule {

@@ -12,20 +12,20 @@ import { EmitService } from '../../../common/services/emit.service';
 })
 export class SysOrderComponent {
 
-    orderList: any[] = []
+    orderList: any[] = [];
     count: number;
-    pageindex = 1
+    pageindex = 1;
     q = {
         max: 10,
         offset: 0,
         status: ''
-    }
-    loading = true
+    };
+    loading = true;
     details_isVisible = false;
 
-    executionList: any[] = []
-    executionStepList: any[] = []
-    currentStep: number
+    executionList: any[] = [];
+    executionStepList: any[] = [];
+    currentStep: number;
     statusList = [
         { label: '全部', value: '' },
         { label: '已下单', value: 'CREATED' },
@@ -38,8 +38,6 @@ export class SysOrderComponent {
     statusMap: any;
 
     order: any;
-    orderItemList: any[] = []
-
 
     constructor(private _orderService: OrderService
         , private _walletService: WalletService
@@ -50,7 +48,7 @@ export class SysOrderComponent {
             'DONE': '成交', 'BREACHED': '违约', 'CANCELED': '取消'
         };
 
-        this.initData()
+        this.initData();
     }
     initData() {
         this.order = {
@@ -77,15 +75,16 @@ export class SysOrderComponent {
             deadlineP2: null,
             paymentP2: null,
             deadline: null
-        }
+        };
         this.executionStepList = [
             { text: '买家下单', time: null },
             { text: '卖家未签单', time: null },
             { text: '买家未付首款,卖家未确认', time: null },
             { text: '卖家未发货,买家未确认', time: null },
             { text: '买家未付尾款,卖家未确认', time: null },
-            { text: '交易未完成', time: null }]
+            { text: '交易未完成', time: null }];
     }
+
     ngOnInit() {
         this.getData();
     }
@@ -93,37 +92,30 @@ export class SysOrderComponent {
     getData() {
         this.loading = true;
         this._orderService.getOrderList(this.q).subscribe((res: any) => {
-            this.orderList = res.orderList
-            this.count = res.orderCount
-            this.loading = false
+            this.orderList = res.orderList;
+            this.count = res.orderCount;
+            this.loading = false;
         });
     }
 
     pageIndexChange(pageindex: number) {
-        this.q.offset = this.q.max * (pageindex - 1)
-        this.getData()
+        this.q.offset = this.q.max * (pageindex - 1);
+        this.getData();
     }
 
     selectStatus() {
-        this.pageindex = 1
-        this.q.offset = 0
+        this.pageindex = 1;
+        this.q.offset = 0;
         this.getData();
     }
 
     clickBtn(type) {
-        if (type === 'free') {
-            this.router.navigateByUrl(`/orderfee`);
-        } else if (type === 'pointLog') {
-            this.router.navigateByUrl(`/orderpointlog`);
-        } else if (type === 'claim') {
-            this.router.navigateByUrl(`/orderclaim`);
-        }
+
     }
     showDetail(id) {
-        this.initData()
+        this.initData();
         this.details_isVisible = true;
-        this.getOrderItems(id)
-        this.getOrderDetail(id)
+        this.getOrderDetail(id);
 
     }
 
@@ -133,20 +125,10 @@ export class SysOrderComponent {
 
     getOrderDetail(id) {
         this._orderService.getOrder(id).subscribe((res: any) => {
-            console.log('@@@@')
-            console.log(res)
             this.order = res;
-            this.order.billing = this.order.billing ? JSON.stringify(this.order.billing) : '无'
-            this.getExecution(this.order)
-            this.getOrderPointLog(id)
-        })
-    }
-
-    getOrderItems(id) {
-        this._orderService.getOrderItems(id).subscribe((res: any) => {
-            console.log(res)
-            this.orderItemList = res;
-        })
+            this.order.billing = this.order.billing ? JSON.stringify(this.order.billing) : '无';
+            this.getExecution(this.order);
+        });
     }
 
     getExecution(order) {
@@ -162,17 +144,17 @@ export class SysOrderComponent {
         console.log(this.executionStepList)
         this._orderService.getOrderExecutionByOrder(order.id).subscribe((res: any) => {
             this.executionList = res;
-            this.executionStepList[0].time = order.dateCreated
+            this.executionStepList[0].time = order.dateCreated;
             if (order.confirmedBySeller) {
-                this.executionList.length ==0?this.currentStep = 1 : '';
+                this.executionList.length === 0 ? this.currentStep = 1 : '';
                 this.executionStepList[0].text = '买家已下单,卖家已签单';
                 this.executionStepList[0].time = order.dateSigned;
             }
-            if(order.buyerTx1){
+            if (order.buyerTx1) {
                 this.executionStepList[1].text = '买家已质押,卖家未质押';
                 this.executionStepList[1].time = order.buyerTx1.dateCreated;
             }
-            if(order.sellerTx1){
+            if (order.sellerTx1) {
                 this.executionStepList[1].text = '买家已质押,卖家已质押';
                 this.executionStepList[1].time = order.sellerTx1.dateCreated;
             }
@@ -226,76 +208,8 @@ export class SysOrderComponent {
 
     }
 
-    orderPointLogList: any[] = []
-    getOrderPointLog(orderId) {
-        this._orderService.getOrderPointLogList(orderId).subscribe((res: any) => {
-            this.orderPointLogList = res
-        })
-    }
-
-    orderTokenLogList: any[] = []
-    getOrderTokenLog(orderId) {
-        this._orderService.getOrderTokenLogList(orderId).subscribe((res: any) => {
-            this.orderTokenLogList = res
-        })
-    }
-    orderMessageList: any[] = []
-    orderMessageCount: number
-    pageindex_orderMessage = 1;
-    offset_orderMessage = 0;
-    getOrderMessage() {
-        this._orderService.getOrderMessageList({
-            orderId: this.order.id, sort: 'dateCreated', max: 5
-            , filter: 'order', offset: this.offset_orderMessage
-        }).subscribe((res: any) => {
-            console.log(res)
-            this.orderMessageList = res.orderMessageList
-            this.orderMessageCount = res.orderMessageCount
-        })
-    }
-    pageIndexOrderMessage(pageindex: number) {
-        this.offset_orderMessage = 5 * (pageindex - 1)
-        this.getOrderMessage()
-
-    }
-
-    orderFeeList: any[] = []
-    orderFeeCount: number
-    pageindex_orderFee = 1;
-    offset_orderFee = 0;
-    //sellerId  isPaid
-    getOrderFee() {
-        this._orderService.getOrderFeeList({ max: 10, offset: this.offset_orderFee, isPaid: false }).subscribe((res: any) => {
-            console.log(res)
-            this.orderFeeList = res.orderFeeList
-            this.orderFeeCount = res.orderFeeCount
-        })
-    }
-    pageIndexOrderFee(pageindex: number) {
-        this.offset_orderFee = 5 * (pageindex - 1)
-        this.getOrderFee();
-    }
-
     clickTab(type) {
-        if (type === 'orderPoint') {
-            this.getOrderPointLog(this.order.id)
-        }
-        if (type === 'orderToken') {
-            this.getOrderTokenLog(this.order.id)
-        }
-        if (type === 'message') {
-            this.getOrderMessage()
-        }
-        if (type === 'order') {
-            this.getData()
-        }
-        if (type === 'free') {
-            this.getOrderFee()
-        }
-    }
-
-    toOrderFee(sellerId) {
-        this.router.navigate([`/orderfee`], { queryParams: { sellerId: sellerId } });
+        
     }
 
     showUserDetail(id) {
