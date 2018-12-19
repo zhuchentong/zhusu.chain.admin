@@ -12,15 +12,15 @@ export class UserService {
     }
 
     public getUser(id) {
-        return  this.http.get(URL.USER+'/'+id);
+        return  this.http.get(URL.USER + '/' + id);
     }
 
-    public frozenUser(id,operation) {
-        return  this.http.put(URL.USER+'/'+id+`?operation=${operation}`);
+    public frozenUser(id, operation) {
+        return  this.http.put(URL.USER + '/' + id + `?operation=${operation}`);
     }
 
     public resetPassword(username) {
-        return  this.http.put(URL.USER+'/resetPassword',{username:username});
+        return  this.http.put(URL.USER + '/resetPassword', {username: username});
     }
 
     public saveUser(user) {
@@ -32,15 +32,15 @@ export class UserService {
     }
 
     public getSellerApplication(id) {
-        return  this.http.get(URL.SELLERAPPLICATION+'/'+id);
+        return  this.http.get(URL.SELLERAPPLICATION + '/' + id);
     }
 
     public approveSellerApplication(id, saleZones) {
-        return  this.http.put(URL.SELLERAPPLICATION+'/approve',{id,saleZones});
+        return  this.http.put(URL.SELLERAPPLICATION + '/approve', {id, saleZones});
     }
 
     public refuseSellerApplication(id, reason) {
-        return  this.http.put(URL.SELLERAPPLICATION+'/refuse',{id,reason});
+        return  this.http.put(URL.SELLERAPPLICATION + '/refuse', {id, reason});
     }
 
     public getSellerLicenseList() {
