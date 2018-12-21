@@ -13,7 +13,6 @@ import { EmitService } from '../../common/services/emit.service';
 })
 export class UserComponent implements OnInit {
 
-  userType: any;
   userList: any[] = [];
   roleList: any[] = [];
   count: number;
@@ -47,7 +46,6 @@ export class UserComponent implements OnInit {
       , { label: '酒店管理员', value: 'ROLE_SELLER' }
       , { label: '系统管理员', value: 'ROLE_ADMIN' }
     ];
-    this.userType = this.roleList[0].value;
     this.q.role = this.roleList[0].value;
     this.modalTitle = '';
     this.isShowDetail = false;
@@ -55,7 +53,6 @@ export class UserComponent implements OnInit {
 
   ngOnInit() {
     this.activedRoute.queryParams.subscribe(params => {
-      console.log(params);
       this.getData();
     });
 
@@ -95,7 +92,6 @@ export class UserComponent implements OnInit {
   }
 
   selectRole(event) {
-    this.userType = event;
     this.pageindex = 1;
     this.q.offset = 0;
     this.getData();
@@ -143,5 +139,10 @@ export class UserComponent implements OnInit {
 
   handleCancel() {
     this.user_isVisible = false;
+  }
+
+  pageIndexChange(pageindex: number) {
+    this.q.offset = this.q.max * (pageindex - 1);
+    this.getData();
   }
 }

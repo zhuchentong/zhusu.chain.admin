@@ -10,11 +10,11 @@
 </page-header>
 
 <nz-card [nzBordered]="false" class="mb-lg">
-  <nz-tabset [(nzSelectedIndex)]="selectedIndex">
-    <nz-tab nzTitle="用户管理" (nzSelect)="clickTab('user')">
+  <nz-tabset>
+    <nz-tab nzTitle="用户管理">
       <div class="search-line">
         角色：
-        <nz-select style="width: 250px" [(ngModel)]="q.role" nzAllowClear nzPlaceHolder="请选择角色" (ngModelChange)="selectRole($event)">
+        <nz-select style="width: 250px" [(ngModel)]="q.role" nzPlaceHolder="请选择角色" (ngModelChange)="selectRole($event)">
           <nz-option *ngFor="let role of roleList" [nzLabel]="role.label" [nzValue]="role.value">
           </nz-option>
         </nz-select>
@@ -28,14 +28,16 @@
               <tr>
                 <th>手机号</th>
                 <th>昵称</th>
+                <th *ngIf="q.role === 'ROLE_YH'">身份证</th>
                 <th>有效</th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let user of basicTable.data; let i = index">
-                <td>{{user.username}}</td>
+                <td><a (click)="showDetail(user.id)">{{user.username}}</a></td>
                 <td>{{user.displayName}}</td>
+                <td *ngIf="q.role === 'ROLE_YH'">{{user.idCard}}</td>
                 <td>{{user.enabled | _Boolean}}</td>
                 <td>
                   <a nz-popconfirm nzTitle="你确定重置该用户的密码么?" (nzOnConfirm)="resetPassword(user.username)">重置密码</a>
