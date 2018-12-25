@@ -9,24 +9,11 @@ import { HotelListComponent } from './hotel-list.component';
 export class HotelComponent {
   @ViewChild('onSaleComponent')
   onSaleComponent: HotelListComponent;
-  @ViewChild('downSaleComponent')
-  downSaleComponent: HotelListComponent;
 
   constructor(private router: Router) {
 
   }
-
-  selectTab(event) {
-    if (event === 'on') {
-      this.onSaleComponent.tabData(true);
-      this.onSaleComponent.hotelList = [];
-      this.onSaleComponent.count = 0;
-    } else {
-      this.downSaleComponent.hotelList = [];
-      this.downSaleComponent.count = 0;
-      this.downSaleComponent.tabData(false);
-    }
-  }
+  
   clickExtraTemplate(type) {
     if (type === 'tag') {
       this.router.navigateByUrl(`/tag`);

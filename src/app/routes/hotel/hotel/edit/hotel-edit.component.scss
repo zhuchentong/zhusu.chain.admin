@@ -7,4 +7,7 @@
   float:right;
 }
 
-
+.editable-tag ::ng-deep .ant-tag {
+  background: rgb(255, 255, 255);
+  border-style: dashed;
+}
