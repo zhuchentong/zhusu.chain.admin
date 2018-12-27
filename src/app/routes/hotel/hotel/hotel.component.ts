@@ -7,8 +7,6 @@ import { HotelListComponent } from './hotel-list.component';
   styleUrls: ['hotel.component.scss']
 })
 export class HotelComponent {
-  @ViewChild('onSaleComponent')
-  onSaleComponent: HotelListComponent;
 
   constructor(private router: Router) {
 

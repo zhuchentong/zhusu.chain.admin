@@ -9,7 +9,6 @@
     [(nzPageIndex)]="pageindex" (nzPageIndexChange)="pageIndexChange($event)"  [nzLoading]="loading" >
       <thead>
         <tr>
-          <th>酒店编号</th>
           <th>酒店名称</th>
           <th>酒店类型</th>
           <th>酒店星级</th>
@@ -19,11 +18,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let hotel of basicTable.data">
-          <td>{{hotel.id}}</td>
           <td>{{hotel.name}}</td>
           <td>{{hotel.hotelType}}</td>
           <td>{{hotel.grand}}</td>
-          <td>{{hotel.managerId}}</td>
+          <td>{{hotel.manager.displayName}}</td>
           <td>
             <a (click)="edit(hotel)">修改</a>
              <nz-divider nzType="vertical"></nz-divider>

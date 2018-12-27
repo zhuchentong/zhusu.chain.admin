@@ -37,11 +37,11 @@ const routes: Routes = [
       { path: 'role', component: RoleComponent, data: { title: '角色' } },
       { path: 'profile', component: ProfileComponent },
       { path: 'hotel', component: HotelComponent },
-      { path: 'hotel/edit/:id', component: HotelEditComponent, data: { title: '商品' } },
+      { path: 'hotel/edit/:id', component: HotelEditComponent, data: { title: '酒店/民宿' } },
       { path: 'post', component: PostComponent },
       { path: 'sysorder', component: SysOrderComponent },
       { path: 'eth-address', component: EthAddressComponent, data: { title: '平台钱包' } },
-      { path: 'tag', component: TagComponent, data: { title: '分类管理' } },
+      { path: 'tag', component: TagComponent, data: { title: '标签管理' } },
       { path: 'wallet', component: WalletComponent, data: { title: '钱包' } },
       { path: 'settings', component: SettingsComponent, data: { title: '系统设置' } }
     ],

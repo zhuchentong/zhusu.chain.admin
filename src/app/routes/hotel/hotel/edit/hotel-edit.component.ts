@@ -3,6 +3,7 @@ import { NzMessageService, NzNotificationService } from 'ng-zorro-antd';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EditorConfig } from '../../../../common/editor/model/editor-config';
 import { HotelService } from '../../../../common/services/hotel.service';
+import { UserService } from '../../../../common/services/user.service';
 import { RegularService } from '../../../../common/services/regular.service';
 import { _HttpClient } from '@delon/theme';
 import { zip } from 'rxjs';
@@ -19,22 +20,27 @@ export class HotelEditComponent implements OnInit {
     id: null,
     name: null,
     hotelType: null,
-    totalRanking: null,
-    commenterCount: null,
     location: null,
+    position: {lat: null, lng: null},
     description: null,
-    tags: null,
-    managerId: null,
+    tags: [],
+    manager: {id: null},
     englishName: null,
     grand: null,
-    facilities: null,
+    facilities: ['餐厅', '免费WiFi', '残障通道'],
     contact: null,
-    photos: null
+    photos: []
   };
+  q = {
+    offset: 0,
+    max: 10,
+    role: 'ROLE_SELLER'
+  };
+  editType = '';
   imagesList: any[] = [];
   hotelTypeList: any[] = [];
   tagList: any[] = [];
-  facilitiesList: string[] = ['餐厅', '免费WiFi', '残障通道'];
+  managerList: any[] = [];
   setting = { title: '新增', bttitle: '保存' };
   isUpdate: boolean;
   inputVisible = false;
@@ -47,7 +53,8 @@ export class HotelEditComponent implements OnInit {
     , private _activedRoute: ActivatedRoute
     , private http: _HttpClient
     , private _sanitizer: DomSanitizer
-    , private _ossService: OssService) {
+    , private _ossService: OssService
+    , private _userService: UserService) {
   }
   ngOnInit() {
     this.hotelTypeList = [{ label: '酒店', value: 'HOTEL' }
@@ -56,16 +63,15 @@ export class HotelEditComponent implements OnInit {
     this._activedRoute.params.subscribe(params => {
       const id = params['id'];
       if (id === 0) {
-        this.hotel.tags.forEach(tag => {
-          tag.checked = false;
-        });
+        this.editType = '新增酒店';
       } else if (id > 0) {
         this.hotel.id = id;
         this.getHotel();
+        this.editType = '修改信息';
       }
-      this.getTagList();
     });
     this.isUpdate = false;
+    this.getManagerList();
   }
 
 
@@ -73,8 +79,14 @@ export class HotelEditComponent implements OnInit {
     this.router.navigateByUrl(`/hotel`);
   }
 
-  grandChanged() {
-    console.log(this.hotel.grand);
+  hotelTypeChanged() {
+    this.hotel.grand = 1;
+  }
+
+  convert() {
+    this.hotel.position.lat = parseFloat(this.hotel.position.lat);
+    console.log(this.hotel.position.lat);
+    this.hotel.position.lng = parseFloat(this.hotel.position.lng);
   }
 
   getHotel() {
@@ -87,33 +99,44 @@ export class HotelEditComponent implements OnInit {
           this.imagesList.push({ url: b, file: null, filename: null, ossUrl: b });
         });
       }
-      if (this.hotel.tags) {
-        this.hotel.tags.forEach(tag => {
-          tag.checked = true;
-        });
-      }
+      this.getTagList();
     });
   }
 
   getTagList() {
     this._hotelService.getTagList().subscribe((res: any) => {
-        console.log(res);
         if (res[0] !== null) {
-            this.tagList = res;
+          this.tagList = res.tagList;
+        }
+        if (this.hotel.tags) {
+          this.tagList.forEach(tag => {
+            if (this.hotel.tags.indexOf(tag.name) !== -1) {
+              tag.checked = true;
+            }
+          });
         }
     });
   }
 
-  tagCheckChange(e: boolean, id): void {
-    this.hotel.tags.push(id);
+  getManagerList() {
+    this._userService.getUserList(this.q).subscribe((res: any) => {
+      this.managerList = res.userList;
+    });
+  }
+  tagCheckChange(e: boolean, name): void {
+    if (e && this.hotel.tags.indexOf(name) === -1) {
+      this.hotel.tags.push(name);
+    } else if (!e) {
+      this.hotel.tags.splice(this.hotel.tags.indexOf(name), 1);
+    }
   }
 
   facilityCheckChange(e: boolean, facility) {
     this.hotel.facilities.push(facility);
   }
 
-  handleClose(removedTag: {}): void {
-    this.facilitiesList = this.facilitiesList.filter(facility => facility !== removedTag);
+  handleClose(removedTag): void {
+    this.hotel.facilities = this.hotel.facilities.filter(facility => facility !== removedTag);
   }
 
   sliceTagName(facility: string): string {
@@ -129,8 +152,8 @@ export class HotelEditComponent implements OnInit {
   }
 
   handleInputConfirm(): void {
-    if (this.inputValue && this.facilitiesList.indexOf(this.inputValue) === -1) {
-      this.facilitiesList.push(this.inputValue);
+    if (this.inputValue && this.hotel.facilities.indexOf(this.inputValue) === -1) {
+      this.hotel.facilities.push(this.inputValue);
     }
     this.inputValue = '';
     this.inputVisible = false;
@@ -142,19 +165,19 @@ export class HotelEditComponent implements OnInit {
       this.hotel.photos.push(image.ossUrl);
     });
     if (this.imagesList.length === 0) {
-      this.hotel.photos = null;
+      this.hotel.photos = [];
     }
+    this.convert();
     if (this.hotel.id > 0) {
+      this.hotel.manager = {id: this.hotel.manager.id};
       this._hotelService.updateHotel(this.hotel.id, this.hotel).subscribe(res => {
         this._msg.success(`修改成功！`);
-        this.router.navigateByUrl(`/hotels`);
+        this.router.navigateByUrl(`/hotel`);
       });
     } else {
-      this.hotel.totalRanking = 0;
-      this.hotel.commenterCount = 0;
       this._hotelService.saveHotel(this.hotel).subscribe(res => {
         this._msg.success(`新增成功！`);
-        this.router.navigateByUrl(`/hotels`);
+        this.router.navigateByUrl(`/hotel`);
       });
     }
   }
@@ -287,16 +310,6 @@ export class HotelEditComponent implements OnInit {
       this._msg.error('酒店类型不能为空！');
       return false;
     }
-    validate = this._regularService.isBlank(this.hotel.totalRanking);
-    if (this.hotel.id > 0 && validate) {
-      this._msg.error('评分数不能为空！');
-      return false;
-    }
-    validate = this._regularService.isBlank(this.hotel.commenterCount);
-    if (this.hotel.id > 0 && validate) {
-      this._msg.error('评论数不能为空！');
-      return false;
-    }
     validate = this._regularService.isBlank(this.hotel.location);
     if (validate) {
       this._msg.error('位置描述不能为空！');
@@ -307,7 +320,7 @@ export class HotelEditComponent implements OnInit {
       this._msg.error('酒店描述不能为空！');
       return false;
     }
-    validate = this._regularService.isBlank(this.hotel.managerId);
+    validate = this._regularService.isBlank(this.hotel.manager.id);
     if (validate) {
       this._msg.error('管理员不能为空！');
       return false;
@@ -317,9 +330,8 @@ export class HotelEditComponent implements OnInit {
       this._msg.error('酒店英文名不能为空！');
       return false;
     }
-    validate = this._regularService.isBlank(this.hotel.grand);
-    if (validate) {
-      this._msg.error('酒店星级不能为空！');
+    if (this.hotel.hotelType === 'HOTEL' && this.hotel.grand === 0) {
+      this._msg.error('酒店星级至少为1！');
       return false;
     }
     validate = this._regularService.isBlank(this.hotel.contact);

@@ -46,7 +46,7 @@ export class TagComponent implements OnInit {
         this._hotelService.getTagList().subscribe((res: any) => {
             console.log(res);
             if (res[0] !== null) {
-                this.tagList = res;
+                this.tagList = res.tagList;
             }
         });
     }
@@ -89,6 +89,7 @@ export class TagComponent implements OnInit {
     editTag(id) {
         this.modalTitle = '修改分类';
         this._hotelService.getTag(id).subscribe((res: any) => {
+            console.log(res);
             this.action = 'edit';
             this.tag = {
                 id: res.id,

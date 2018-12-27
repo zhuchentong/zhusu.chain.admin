@@ -7,13 +7,13 @@
             <nz-breadcrumb-item>
                 <a [routerLink]="['/hotel']">酒店管理</a>
             </nz-breadcrumb-item>
-            <nz-breadcrumb-item>修改信息</nz-breadcrumb-item>
+            <nz-breadcrumb-item>{{ editType }}</nz-breadcrumb-item>
         </nz-breadcrumb>
     </ng-template>
 </page-header>
 <nz-card [nzBordered]="false">
     <nz-tabset [nzTabBarExtraContent]="extraTemplate">
-        <nz-tab nzTitle="基本信息">
+        <nz-tab nzTitle="酒店信息">
             <form nz-form>
                 <nz-form-item>
                     <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="name">名称</nz-form-label>
@@ -25,29 +25,19 @@
                         <input nz-input [(ngModel)]="hotel.englishName" name="englishName" placeholder="请输入酒店/民宿英文名">
                     </nz-form-control>
                 </nz-form-item>
-                <nz-form-item *ngIf="hotel.id > 0">
-                    <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="totalRanking">评分数</nz-form-label>
-                    <nz-form-control nzXs="24" nzSm="12" nzMd="8">
-                        <input nz-input [(ngModel)]="hotel.totalRanking" name="totalRanking" placeholder="请输入评分数">
-                    </nz-form-control>
-                    <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="commenterCount">评论数</nz-form-label>
-                    <nz-form-control nzXs="24" nzSm="12" nzMd="8">
-                        <input nz-input [(ngModel)]="hotel.commenterCount" name="commenterCount" placeholder="请输入评论数">
-                    </nz-form-control>
-                </nz-form-item>
                 <nz-form-item>
                     <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="hotelType">类型</nz-form-label>
                     <nz-form-control nzXs="24" nzSm="12" nzMd="8">
-                        <nz-select nzPlaceHolder="请选择酒店类型" name="hotelType" [(ngModel)]="hotel.hotelType">
+                        <nz-select nzPlaceHolder="请选择酒店类型" name="hotelType" [(ngModel)]="hotel.hotelType" (ngModelChange)="hotelTypeChanged()"> 
                             <nz-option *ngFor="let hotelType of hotelTypeList" [nzLabel]="hotelType.label" 
                                 [nzValue]="hotelType.value"></nz-option>
                         </nz-select>
                     </nz-form-control>
-                    <nz-form-control *ngIf="hotel.hotelType === 'HOTEL'"  nzXs="24" nzSm="7" nzMd="11">
-                        <nz-form-label nzXs="24" nzSm="6" nzRequired nzFor="grand">星级</nz-form-label>
-                        <nz-form-control nzXs="24" nzSm="8" nzMd="16">
-                            <nz-rate [(ngModel)]="hotel.grand" [nzAllowHalf] = "false" [nzCount] = 7 
-                                (ngModelChange) = "grandChanged()" name = "grand"></nz-rate>
+                    <nz-form-control *ngIf="hotel.hotelType === 'HOTEL'" nzXs="24" nzSm="12">
+                        <nz-form-label nzRequired nzXs="24" nzSm="6" nzFor="grand">星级</nz-form-label>
+                        <nz-form-control nzXs="24" nzSm="12" nzMd="16">
+                            <nz-rate [(ngModel)]="hotel.grand" [nzAllowHalf] = "false" [nzCount] = 7
+                                name = "grand"></nz-rate>
                             <span class="ant-rate-text">{{ hotel.grand }} 星级</span>
                         </nz-form-control>
                     </nz-form-control>
@@ -63,29 +53,41 @@
                     </nz-form-control>
                 </nz-form-item>
                 <nz-form-item>
+                    <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="lat">纬度</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="8">
+                        <input nz-input [(ngModel)]="hotel.position.lat" name="lat" placeholder="请输入纬度">
+                    </nz-form-control>
+                    <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="lat">经度</nz-form-label>
+                    <nz-form-control nzXs="24" nzSm="12" nzMd="8">
+                        <input nz-input [(ngModel)]="hotel.position.lng" name="lng" placeholder="请输入经度">
+                    </nz-form-control>        
+                </nz-form-item>
+                <nz-form-item>
                     <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="description">描述</nz-form-label>
                     <nz-form-control nzXs="24" nzSm="12" nzMd="8">
                         <input nz-input [(ngModel)]="hotel.description" name="description" placeholder="请输入酒店描述">
                     </nz-form-control>
-                    <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="managerId">管理员</nz-form-label>
+                    <nz-form-label nzXs="24" nzSm="3" nzRequired nzFor="manager">管理员</nz-form-label>
                     <nz-form-control nzXs="24" nzSm="12" nzMd="8">
-                        <input nz-input [(ngModel)]="hotel.managerId" name="managerId" placeholder="请输入管理员ID">
+                        <nz-select nzPlaceHolder="请选择管理员" name="manager" [(ngModel)]="hotel.manager.id">
+                            <nz-option *ngFor="let manager of managerList" [nzLabel]="manager.displayName" 
+                                [nzValue]="manager.id"></nz-option>
+                        </nz-select>
                     </nz-form-control> 
                 </nz-form-item>
                 <nz-form-item>
                     <nz-form-label nzXs="24" nzSm="3" nzFor="tags">标签</nz-form-label>
                     <nz-form-control nzXs="24" nzSm="12" nzMd="8">
                         <nz-tag *ngFor="let tag of tagList" nzMode="checkable" [(nzChecked)]="tag.checked" 
-                            (nzCheckedChange)="tagCheckChange($event, tag.id)"><i class="fa fa-tag" 
+                            (nzCheckedChange)="tagCheckChange($event, tag.name)"><i class="fa fa-tag" 
                             aria-hidden="true"></i>{{tag.name}}</nz-tag>                   
                     </nz-form-control>
                 </nz-form-item>
                 <nz-form-item>
                     <nz-form-label nzXs="24" nzSm="3" nzFor="facilities">设施</nz-form-label>
                     <nz-form-control nzXs="24" nzSm="12" nzMd="8">
-                        <nz-tag *ngFor="let facility of facilitiesList; let i = index;" nzMode="closeable" 
-                            (nzAfterClose)="handleClose(facility)" 
-                            (nzChange)="facilityCheckChange($event,facility)">{{ sliceTagName(facility) }}</nz-tag>
+                        <nz-tag *ngFor="let facility of hotel.facilities; let i = index;" nzMode="closeable" 
+                            (nzAfterClose)="handleClose(facility)">{{ sliceTagName(facility) }}</nz-tag>
                         <nz-tag *ngIf="!inputVisible" class="editable-tag" (click)="showInput()">
                                 <i class="fa fa-plus" aria-hidden="true"></i>添加</nz-tag>
                         <input #inputElement nz-input nzSize="small" *ngIf="inputVisible" type="text" 
