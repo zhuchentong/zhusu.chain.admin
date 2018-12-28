@@ -1,4 +1,4 @@
-<page-header  [title]="''">
+<page-header [title]="''">
   <ng-template #breadcrumb>
     <nz-breadcrumb>
       <nz-breadcrumb-item>
@@ -9,12 +9,36 @@
   </ng-template>
 </page-header>
 <nz-card [nzBordered]="false">
-  <nz-tabset [nzTabBarExtraContent]="extraTemplate">
-    <nz-tab nzTitle="酒店管理">
-      <hotel-list></hotel-list>
-    </nz-tab>
-  </nz-tabset>
-  <ng-template #extraTemplate>
+  <div class="mb-md">
+    <button nz-button (click)="edit({id:0})" [nzType]="'primary'">
+      <i class="anticon anticon-plus"></i>
+      <span>新建</span>
+    </button>
     <button nz-button (click)="clickExtraTemplate('tag')">标签管理</button>
-  </ng-template>
+  </div>
+  <nz-table #basicTable [nzData]="hotelList" [(nzPageSize)]="q.max" [nzFrontPagination]="false" [nzTotal]="count"
+    [(nzPageIndex)]="pageindex" (nzPageIndexChange)="pageIndexChange($event)" [nzLoading]="loading">
+    <thead>
+      <tr>
+        <th>酒店名称</th>
+        <th>酒店类型</th>
+        <th>酒店星级</th>
+        <th>管理员</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let hotel of basicTable.data">
+        <td>{{hotel.name}}</td>
+        <td>{{hotel.hotelType}}</td>
+        <td>{{hotel.grand}}</td>
+        <td>{{hotel.manager.displayName}}</td>
+        <td>
+          <a (click)="edit(hotel)">修改</a>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a (click)="deleteHotel(hotel)">删除</a>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
 </nz-card>

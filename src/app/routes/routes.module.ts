@@ -22,7 +22,6 @@ import { EthAddressComponent } from './wallet/eth-address/eth-address.component'
 import { TxLogComponent } from './wallet/tx-log/tx-log.component';
 import { WalletComponent } from './wallet/wallet/wallet.component';
 import { TagComponent } from './hotel/tag/tag.component';
-import { HotelListComponent } from './hotel/hotel/hotel-list.component';
 import { HotelEditComponent } from './hotel/hotel/edit/hotel-edit.component';
 import { LMarkdownEditorModule } from 'ngx-markdown-editor';
 import { Token } from '@angular/compiler';
@@ -47,7 +46,6 @@ const COMPONENTS = [
   EthAddressComponent,
   TxLogComponent,
   WalletComponent,
-  HotelListComponent,
   HotelEditComponent,
   TagComponent,
   UserDetailComponent,
@@ -58,7 +56,7 @@ const COMPONENTS_NOROUNT = [];
 
 @NgModule({
   imports: [SharedModule, RouteRoutingModule, LMarkdownEditorModule],
-  declarations: [...COMPONENTS, ...COMPONENTS_NOROUNT, SettingsComponent],
+  declarations: [...COMPONENTS, ...COMPONENTS_NOROUNT],
   entryComponents: COMPONENTS_NOROUNT
 })
 export class RoutesModule { }

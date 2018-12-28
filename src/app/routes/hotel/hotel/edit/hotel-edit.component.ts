@@ -61,8 +61,9 @@ export class HotelEditComponent implements OnInit {
       , { label: '民宿', value: 'HOMESTAY' }
     ];
     this._activedRoute.params.subscribe(params => {
-      const id = params['id'];
-      if (id === 0) {
+      const id = params.id;
+      if (id === '0') {
+        console.log(id);
         this.editType = '新增酒店';
       } else if (id > 0) {
         this.hotel.id = id;
