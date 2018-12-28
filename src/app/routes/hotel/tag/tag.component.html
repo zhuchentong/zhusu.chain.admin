@@ -5,9 +5,9 @@
         <a [routerLink]="['/']">首页</a>
       </nz-breadcrumb-item>
       <nz-breadcrumb-item>
-        <a [routerLink]="['/hotel']">房源管理</a>
+        <a [routerLink]="['/hotel']">酒店管理</a>
       </nz-breadcrumb-item>
-      <nz-breadcrumb-item>分类管理</nz-breadcrumb-item>
+      <nz-breadcrumb-item>标签管理</nz-breadcrumb-item>
     </nz-breadcrumb>
   </ng-template>
 </page-header>
@@ -18,7 +18,7 @@
   <nz-table #filterTable [nzData]="tagList" [nzFrontPagination]="false" [nzShowPagination]="false">
     <thead>
       <tr>
-        <th>分类名</th>
+        <th>标签名</th>
         <th>操作</th>
       </tr>
     </thead>
@@ -39,9 +39,9 @@
     <div class="form">
       <form nz-form>
         <nz-form-item>
-          <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="tagName">分类名</nz-form-label>
+          <nz-form-label nzXs="24" nzSm="7" nzRequired nzFor="tagName">标签名</nz-form-label>
           <nz-form-control nzXs="24" nzSm="12" nzMd="10">
-            <input nz-input [(ngModel)]="tag.name" name="tagName" placeholder="请填入分类名">
+            <input nz-input [(ngModel)]="tag.name" name="tagName" placeholder="请填入标签名">
           </nz-form-control>
         </nz-form-item>
       </form>

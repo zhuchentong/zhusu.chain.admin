@@ -1,35 +1,57 @@
-import { Component, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { HotelListComponent } from './hotel-list.component';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NzMessageService, NzNotificationService } from 'ng-zorro-antd';
+import { HotelService } from '../../../common/services/hotel.service';
 @Component({
   selector: 'hotel',
   templateUrl: 'hotel.component.html',
   styleUrls: ['hotel.component.scss']
 })
-export class HotelComponent {
-  @ViewChild('onSaleComponent')
-  onSaleComponent: HotelListComponent;
-  @ViewChild('downSaleComponent')
-  downSaleComponent: HotelListComponent;
+export class HotelComponent implements OnInit {
 
-  constructor(private router: Router) {
+  hotelList: any[] = [];
+  count: number;
+  pageindex = 1;
+  q: any = {
+    offset: 0,
+    max: 10
+  };
+  loading = true;
 
+  constructor(private router: Router
+    , private _msg: NzMessageService
+    , private _HotelService: HotelService) {
   }
 
-  selectTab(event) {
-    if (event === 'on') {
-      this.onSaleComponent.tabData(true);
-      this.onSaleComponent.hotelList = [];
-      this.onSaleComponent.count = 0;
-    } else {
-      this.downSaleComponent.hotelList = [];
-      this.downSaleComponent.count = 0;
-      this.downSaleComponent.tabData(false);
-    }
+  ngOnInit() {
+    this.getList();
   }
   clickExtraTemplate(type) {
     if (type === 'tag') {
       this.router.navigateByUrl(`/tag`);
     } 
+  }
+  getList() {
+    this.loading = true;
+    this._HotelService.getHotelList(this.q).subscribe((res: any) => {
+      this.hotelList = res.hotelList;
+      this.count = res.hotelCount;
+      this.loading = false;
+    });
+  }
+  // 进入新增/编辑界面
+  edit(i) {
+    this.router.navigateByUrl(`/hotel/edit/` + i.id);
+  }
+  pageIndexChange(pageindex: number) {
+    this.q.offset = this.q.max * (pageindex - 1);
+    this.getList();
+  }
+
+  deleteHotel(i) {
+    this._HotelService.deleteHotel(i.id).subscribe(res => {
+      this._msg.success(`删除成功！`);
+      this.getList();
+    });
   }
 }

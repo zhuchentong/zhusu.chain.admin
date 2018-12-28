@@ -7,4 +7,6 @@
   float:right;
 }
 
-
+.editable-tag ::ng-deep .ant-tag {
+  border-style: dashed;
+}
