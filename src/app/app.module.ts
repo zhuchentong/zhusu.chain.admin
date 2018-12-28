@@ -44,6 +44,7 @@ import { WalletService } from './common/services/wallet.service';
 import { CommonService } from './common/services/common.service';
 import { EmitService } from './common/services/emit.service';
 import { EditorMdDirective } from './common/editor/editor-md.directive';
+import { CommentService } from './common/services/comment.service';
 
 // 加载i18n语言文件
 export function I18nHttpLoaderFactory(http: HttpClient) {
@@ -116,7 +117,8 @@ export function StartupServiceFactory(
     OrderService,
     WalletService,
     CommonService,
-    EmitService
+    EmitService,
+    CommentService
   ],
   bootstrap: [AppComponent],
 })

@@ -28,6 +28,7 @@ import { Token } from '@angular/compiler';
 import { UserDetailComponent } from './user/user-detail/user-detail.component';
 import { PostDialogComponent } from './post/post-dialog/post-dialog.component';
 import { SettingsComponent } from './settings/settings.component';
+import { CommentComponent } from './comment/comment.component';
 
 const COMPONENTS = [
   WorkplaceComponent,
@@ -50,7 +51,8 @@ const COMPONENTS = [
   TagComponent,
   UserDetailComponent,
   PostDialogComponent,
-  SettingsComponent
+  SettingsComponent,
+  CommentComponent
 ];
 const COMPONENTS_NOROUNT = [];
 

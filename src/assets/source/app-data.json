@@ -39,6 +39,13 @@
           "link": "/sysorder"
         },
         {
+          "text": "评论管理",
+          "i18n": "comment",
+          "icon": "icon-bubble",
+          "reuse": false,
+          "link": "/comment"
+        },
+        {
           "text": "钱包管理",
           "i18n": "wallet",
           "icon": "icon-wallet",

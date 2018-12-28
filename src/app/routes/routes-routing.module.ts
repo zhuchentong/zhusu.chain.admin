@@ -26,6 +26,7 @@ import { WalletComponent } from './wallet/wallet/wallet.component';
 import { TagComponent } from './hotel/tag/tag.component';
 import { HotelEditComponent } from './hotel/hotel/edit/hotel-edit.component';
 import { SettingsComponent } from './settings/settings.component';
+import { CommentComponent } from './comment/comment.component';
 const routes: Routes = [
   {
     path: '',
@@ -43,7 +44,8 @@ const routes: Routes = [
       { path: 'eth-address', component: EthAddressComponent, data: { title: '平台钱包' } },
       { path: 'tag', component: TagComponent, data: { title: '标签管理' } },
       { path: 'wallet', component: WalletComponent, data: { title: '钱包' } },
-      { path: 'settings', component: SettingsComponent, data: { title: '系统设置' } }
+      { path: 'settings', component: SettingsComponent, data: { title: '系统设置' } },
+      { path: 'comment', component: CommentComponent, data: { title: '评论管理' } }
     ],
   },
   // passport

@@ -1,0 +1,37 @@
+<page-header [title]="''">
+  <ng-template #breadcrumb>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/']">首页</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>评论管理</nz-breadcrumb-item>
+    </nz-breadcrumb>
+  </ng-template>
+</page-header>
+
+<nz-card [nzBordered]="false">
+  <nz-table #basicTable [nzData]="commentList" [nzLoading]="loading">
+    <thead>
+      <tr>
+        <th>用户</th>
+        <th>酒店</th>
+        <th>评论内容</th>
+        <th>评分</th>
+        <th>时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of basicTable.data">
+        <td>{{ data.writer.displayName }}</td>
+        <td>{{ data.hotel.name}}</td>
+        <td>{{ data.content }}</td>
+        <td>{{ data.ranking }}</td>
+        <td>{{ data.dateCreated | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+        <td>
+          <a nz-popconfirm nzTitle="你确定要删除该评论么?" (nzOnConfirm)="delete(data)">删除</a>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-card>
