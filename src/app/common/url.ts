@@ -43,7 +43,8 @@ export const URL = {
   // 订单执行情况
   , ORDEREXCUTION: '/api/orders/allExecutions'
 
-
+  // 评论
+  , COMMENT: '/api/comments'
 
   // splash
   , SPLASH: '/api/splashes'
