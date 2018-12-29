@@ -9,89 +9,51 @@
     </ng-template>
 </page-header>
 <nz-card [nzBordered]="false" class="mb-lg">
-    <nz-tabset [nzTabBarExtraContent]="orderTemplate">
-        <nz-tab nzTitle="订单管理" (nzSelect)="clickTab('order')">
-            <div class="search-line">
-                状态：
-                <nz-select style="width: 250px" [(ngModel)]="q.status" nzPlaceHolder="请选择状态" (ngModelChange)="selectStatus()">
-                    <nz-option *ngFor="let status of statusList" [nzLabel]="status.label" [nzValue]="status.value">
-                    </nz-option>
-                </nz-select>
-            </div>
-            <div nz-row [nzGutter]="24">
-                <div nz-col nzXs="24" nzSm="24" nzMd="24">
-                    <nz-table [nzData]="orderList" #basicTable [(nzPageSize)]="q.max" [nzTotal]="count" [(nzPageIndex)]="pageindex"
-                        (nzPageIndexChange)="pageIndexChange($event)" [nzFrontPagination]="false"  [nzLoading]="loading" >
-                        <thead>
-                            <tr>
-                                <th>订单号</th>
-                                <th>买家</th>
-                                <th>供应商</th>
-                                <th>订单信用分</th>
-                                <th>创建时间</th>
-                                <th>签单时间</th>
-                                <th>订单状态</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let order of basicTable.data; let i = index">
-                                <td><a (click)="showDetail(order.id)">{{order.orderNo}}</a></td>
-                                <td><a (click)="showUserDetail(order.buyer.id)">{{order.buyer.displayName}}【{{order.buyer.username}}】</a></td>
-                                <td *ngIf="order.seller !== undefined"><a (click)="showUserDetail(order.seller.id)">{{order.seller.displayName}}【{{order.seller.username}}】</a><a
-                                        (click)="toOrderFee(order.seller.id)">缴费记录</a></td>
-                                <td *ngIf="order.seller === undefined"></td>
-                                <td>{{order.points}}</td>
-                                <td>{{order.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
-                                <td>{{order.dateSigned | date: 'yyyy-MM-dd HH:mm'}}</td>
-                                <td><a nz-popover nzTitle="执行情况" (click)="getExecution(order)" [nzContent]="popoverTemplate"
-                                        nzPlacement="bottom" nzTrigger="click">{{order.status | i18nSelect: statusMap}}</a></td>
-                            </tr>
-                        </tbody>
-                    </nz-table>
-                </div>
-            </div>
-            <ng-template #popoverTemplate>
-                <div>
-                    <nz-steps [nzCurrent]="currentStep" nzDirection="vertical" nzSize="small">
-                        <nz-step *ngFor="let s of executionStepList" nzTitle="{{s.title}}" nzDescription="{{s.text}}"></nz-step>
-                    </nz-steps>
-                </div>
-            </ng-template>
-        </nz-tab>
-        <nz-tab nzTitle="待缴服务费订单" (nzSelect)="clickTab('free')">
-            <nz-table [nzData]="orderFeeList" #orderFeeTable [nzPageSize]="10" [nzTotal]="orderFeeCount"
-                [(nzPageIndex)]="pageindex_orderFee" (nzPageIndexChange)="pageIndexOrderFee($event)"
-                [nzFrontPagination]="false">
+    <div class="search-line">
+        状态：
+        <nz-select style="width: 250px" [(ngModel)]="q.status" nzPlaceHolder="请选择状态" (ngModelChange)="selectStatus()">
+            <nz-option *ngFor="let status of statusList" [nzLabel]="status.label" [nzValue]="status.value">
+            </nz-option>
+        </nz-select>
+    </div>
+    <div nz-row [nzGutter]="24">
+        <div nz-col nzXs="24" nzSm="24" nzMd="24">
+            <nz-table [nzData]="orderList" #basicTable [(nzPageSize)]="q.max" [nzTotal]="count" [(nzPageIndex)]="pageindex"
+                (nzPageIndexChange)="pageIndexChange($event)" [nzFrontPagination]="false"  [nzLoading]="loading" >
                 <thead>
                     <tr>
-                        <th>订单</th>
-                        <th>用户</th>
-                        <th>是否支付</th>
-                        <th>创建时间</th>
-                        <th>操作</th>
+                        <th>订单号</th>
+                        <th>下单人</th>
+                        <th>房间号</th>
+                        <th>入住时间</th>
+                        <th>离开时间</th>
+                        <th>备注</th>
+                        <th>属性</th>
+                        <th>订单状态</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let orderfee of orderFeeTable.data; let i = index">
-                        <td><a (click)="showDetail(orderfee.hotelOrder.id)">{{orderfee.hotelOrder.orderNo}}</a></td>
-                        <td><a (click)="showUserDetail(orderfee.seller?.id)">{{orderfee.seller?.displayName}}【{{orderfee.seller?.username}}】</a></td>
-                        <td>{{orderfee.isPaid | _Boolean}}</td>
-                        <td>{{orderfee.dateCreated | date: 'yyyy-MM-dd HH:mm'}}</td>
-                        <td>
-                            <a (click)="toOrderFee(orderfee.seller.id)">查看</a>
-                        </td>
+                    <tr *ngFor="let order of basicTable.data; let i = index">
+                        <td><a (click)="showDetail(order.id)">{{order.id}}</a></td>
+                        <td><a (click)="showUserDetail(order.buyer.id)">{{order.buyer.displayName}}【{{order.buyer.username}}】</a></td>
+                        <td>{{order.room.id}}</td>
+                        <td>{{order.beginDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td>{{order.endDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td>{{order.memo}}</td>
+                        <td>{{order.attributes}}</td>
+                        <td><a nz-popover nzTitle="执行情况" (click)="getExecution(order)" [nzContent]="popoverTemplate"
+                                nzPlacement="bottom" nzTrigger="click">{{order.status | i18nSelect: statusMap}}</a></td>
                     </tr>
                 </tbody>
             </nz-table>
-        </nz-tab>
-    </nz-tabset>
-    <ng-template #orderTemplate>
-        <button nz-button (click)="clickBtn('free')">订单服务费</button>
-        <button nz-button (click)="clickBtn('pointLog')">订单信用分日志</button>
-        <!--
-
-            <button nz-button (click)="clickBtn('claim')">订单投诉</button>
-            -->
+        </div>
+    </div>
+    <ng-template #popoverTemplate>
+        <div>
+            <nz-steps [nzCurrent]="currentStep" nzDirection="vertical" nzSize="small">
+                <nz-step *ngFor="let s of executionStepList" nzTitle="{{s.title}}" nzDescription="{{s.text}}"></nz-step>
+            </nz-steps>
+        </div>
     </ng-template>
 </nz-card>
 
