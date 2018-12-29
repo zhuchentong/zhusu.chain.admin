@@ -28,11 +28,10 @@ export class SysOrderComponent {
     currentStep: number;
     statusList = [
         { label: '全部', value: '' },
-        { label: '已下单', value: 'CREATED' },
-        { label: '签单中', value: 'SIGNING' },
-        { label: '执行中', value: 'DOING' },
-        { label: '成交', value: 'DONE' },
-        { label: '违约', value: 'BREACHED' },
+        { label: '创建', value: 'CREATED' },
+        { label: '确认', value: 'CONFIRMED' },
+        { label: '入住', value: 'CHECKIN' },
+        { label: '离开', value: 'CHECKOUT' },
         { label: '取消', value: 'CANCELED' },
     ];
     statusMap: any;
@@ -44,8 +43,8 @@ export class SysOrderComponent {
         , private router: Router
         , private _emitService: EmitService) {
         this.statusMap = {
-            'CREATED': '已下单', 'SIGNING': '签单中', 'DOING': '执行中',
-            'DONE': '成交', 'BREACHED': '违约', 'CANCELED': '取消'
+            'CREATED': '创建', 'CONFIRMED': '确认', 'CHECKIN': '入住',
+            'CHECKOUT': '离开', 'CANCELED': '取消'
         };
 
         this.initData();
